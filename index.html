@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>御言葉サプリ | 心の処方箋</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,23 +27,31 @@
             color: var(--text-color);
             display: flex; justify-content: center; align-items: center;
             min-height: 100vh;
+            /* スマホのアドレスバー対策（100dvh） */
+            min-height: 100dvh;
             overscroll-behavior: none;
             background-image: radial-gradient(#e8e4dc 1px, transparent 1px);
             background-size: 20px 20px;
         }
 
         .container {
-            width: 90%; max-width: 420px;
+            width: 90%; 
+            max-width: 420px;
             background-color: var(--card-bg);
-            padding: 35px 25px;
+            padding: 30px 25px;
             border-radius: 20px;
             box-shadow: 
                 0 10px 25px rgba(93, 85, 72, 0.05),
                 0 0 0 5px rgba(255, 255, 255, 0.5);
             text-align: center;
-            display: flex; flex-direction: column; gap: 20px;
-            height: 90vh; max-height: 780px;
-            justify-content: space-between;
+            display: flex; flex-direction: column; 
+            
+            /* ▼ 縦長画面(19.5:9)対応の修正 ▼ */
+            gap: 2vh; /* 固定pxではなく画面の高さに対する割合で間隔をあける */
+            height: 92dvh; /* 画面の高さの92%を使う */
+            max-height: 900px; /* 上限を緩和して縦長スマホに対応 */
+            justify-content: space-evenly; /* 要素を均等に配置 */
+            
             border: 1px solid #efebe4;
         }
 
@@ -63,17 +71,19 @@
             font-family: 'Kiwi Maru', serif;
         }
 
-        /* ▼▼▼ 検索ボックスのレイアウト変更 ▼▼▼ */
+        /* ▼▼▼ 検索ボックスのズレ修正 ▼▼▼ */
         .search-box {
             display: flex;
             align-items: center;
-            gap: 8px; /* 入力欄とボタンの間隔 */
+            gap: 10px;
             width: 100%;
+            height: 52px; /* 高さを固定してズレを防ぐ */
         }
 
         .search-box input {
-            flex-grow: 1; /* 横幅いっぱいに */
-            padding: 14px 18px;
+            flex-grow: 1;
+            height: 100%; /* 親要素の高さに合わせる */
+            padding: 0 18px; /* 上下のパディングを削除し、高さで制御 */
             border: 2px solid #efebe4;
             border-radius: 30px;
             font-size: 1rem; outline: none;
@@ -81,6 +91,7 @@
             background: #faf9f6;
             color: var(--text-color);
             font-family: 'Zen Maru Gothic', sans-serif;
+            margin: 0; /* 余計なマージンを除去 */
         }
         .search-box input:focus {
             border-color: var(--primary-color);
@@ -88,10 +99,9 @@
             box-shadow: 0 0 0 3px rgba(139, 163, 130, 0.2);
         }
 
-        /* 検索ボタン（虫眼鏡） */
         .search-btn-icon {
             flex-shrink: 0;
-            width: 48px; height: 48px;
+            width: 52px; height: 52px; /* inputと同じ高さに */
             border-radius: 50%;
             background: var(--primary-color);
             border: none;
@@ -100,6 +110,8 @@
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(139, 163, 130, 0.3);
             transition: transform 0.2s, background 0.2s;
+            margin: 0;
+            padding: 0;
         }
         .search-btn-icon:active { transform: scale(0.95); background: #7a9172; }
         .search-btn-icon svg { width: 22px; height: 22px; fill: white; }
@@ -108,6 +120,7 @@
         .tags-container {
             flex-grow: 1; display: flex; flex-direction: column;
             justify-content: center; gap: 15px;
+            max-height: 300px; /* タグエリアが広がりすぎないように */
         }
         .tags-label { 
             font-size: 0.9rem; color: #8d8579; 
@@ -121,11 +134,13 @@
         .tags { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
         .tag {
-            padding: 14px 10px; border-radius: 12px;
-            font-size: 0.9rem; font-weight: 500;
+            padding: 14px 5px; /* 文字数が多い時の改行対策 */
+            border-radius: 12px;
+            font-size: 0.85rem; font-weight: 500;
             cursor: pointer; transition: transform 0.2s, background 0.2s;
             display: flex; align-items: center; justify-content: center;
             background: #f4f1ea; color: #6b6357; border: 1px solid transparent;
+            width: 100%;
         }
         .tag:active { transform: scale(0.96); }
 
@@ -146,6 +161,7 @@
             transition: transform 0.2s, box-shadow 0.2s;
             letter-spacing: 0.05em;
             font-family: 'Zen Maru Gothic', sans-serif;
+            margin-bottom: 10px; /* 下部に少し余裕を */
         }
         .main-btn:active { transform: scale(0.98); box-shadow: 0 3px 10px rgba(139, 163, 130, 0.4); }
 
@@ -249,6 +265,14 @@
         .animate-in { animation: floatUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
 
         .footer { font-size: 0.7rem; color: #b0a99f; margin-top: 10px; }
+        
+        /* 画面が小さい端末（iPhone SEなど）向けの微調整 */
+        @media (max-height: 700px) {
+            .container { height: 96dvh; padding: 20px; }
+            .tags-container { gap: 10px; }
+            .verse-icon { font-size: 2.5rem; margin-bottom: 10px; }
+            .verse-text { font-size: 1.1rem; margin-bottom: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -278,7 +302,7 @@
             </div>
         </div>
 
-        <button class="main-btn" onclick="searchVerse()">おまかせで表示 🔄</button>
+        <button class="main-btn" onclick="searchVerse()">おまかせで表示</button>
         
         <div class="footer">© 2026 Tech Bible Note</div>
     </div>
