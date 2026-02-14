@@ -9,15 +9,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@400;500&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* ナチュラル・アースカラー設定 */
             --bg-color: #f9f7f2;
             --card-bg: #ffffff;
             --text-color: #5d5548;
-            --primary-color: #8ba382; /* セージグリーン */
+            --primary-color: #8ba382;
             --accent-color: #d4a373;
             --shadow: 0 4px 15px rgba(93, 85, 72, 0.08);
         }
 
+        /* ボックスモデルを全要素に適用してはみ出しを防止 */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
@@ -26,8 +26,6 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             display: flex; justify-content: center; align-items: center;
-            min-height: 100vh;
-            /* スマホのアドレスバー対策（100dvh） */
             min-height: 100dvh;
             overscroll-behavior: none;
             background-image: radial-gradient(#e8e4dc 1px, transparent 1px);
@@ -35,115 +33,114 @@
         }
 
         .container {
-            width: 90%; 
+            width: 92%; /* 左右に少し余裕を持たせる */
             max-width: 420px;
             background-color: var(--card-bg);
-            padding: 30px 25px;
+            padding: 30px 20px;
             border-radius: 20px;
             box-shadow: 
                 0 10px 25px rgba(93, 85, 72, 0.05),
                 0 0 0 5px rgba(255, 255, 255, 0.5);
             text-align: center;
             display: flex; flex-direction: column; 
-            
-            /* ▼ 縦長画面(19.5:9)対応の修正 ▼ */
-            gap: 2vh; /* 固定pxではなく画面の高さに対する割合で間隔をあける */
-            height: 92dvh; /* 画面の高さの92%を使う */
-            max-height: 900px; /* 上限を緩和して縦長スマホに対応 */
-            justify-content: space-evenly; /* 要素を均等に配置 */
-            
+            gap: 2vh;
+            height: 92dvh;
+            max-height: 850px;
+            justify-content: space-evenly;
             border: 1px solid #efebe4;
         }
 
         header h1 {
             font-family: 'Kiwi Maru', serif;
-            font-size: 1.7rem;
+            font-size: 1.6rem;
             color: var(--primary-color);
             margin: 0;
             letter-spacing: 0.05em;
-            font-weight: 500;
         }
 
         header p { 
-            font-size: 0.85rem; 
+            font-size: 0.8rem; 
             color: #9c9488; 
-            margin-top: 8px; 
+            margin-top: 5px; 
             font-family: 'Kiwi Maru', serif;
         }
 
-        /* ▼▼▼ 検索ボックスのズレ修正 ▼▼▼ */
+        /* ▼▼▼ 検索ボックス修正：はみ出し防止 ▼▼▼ */
         .search-box {
             display: flex;
             align-items: center;
-            gap: 10px;
-            width: 100%;
-            height: 52px; /* 高さを固定してズレを防ぐ */
+            gap: 8px;
+            width: 100%; /* コンテナ幅に合わせる */
+            height: 50px;
+            margin: 0 auto;
         }
 
         .search-box input {
-            flex-grow: 1;
-            height: 100%; /* 親要素の高さに合わせる */
-            padding: 0 18px; /* 上下のパディングを削除し、高さで制御 */
+            flex: 1; /* 残りの幅をすべて使う */
+            min-width: 0; /* flexアイテムの縮小を許可 */
+            height: 100%;
+            padding: 0 15px;
             border: 2px solid #efebe4;
-            border-radius: 30px;
-            font-size: 1rem; outline: none;
-            transition: all 0.3s ease;
+            border-radius: 25px;
+            font-size: 1rem; 
+            outline: none;
+            transition: border-color 0.3s;
             background: #faf9f6;
             color: var(--text-color);
             font-family: 'Zen Maru Gothic', sans-serif;
-            margin: 0; /* 余計なマージンを除去 */
         }
+
         .search-box input:focus {
             border-color: var(--primary-color);
             background: #fff;
-            box-shadow: 0 0 0 3px rgba(139, 163, 130, 0.2);
         }
 
         .search-btn-icon {
-            flex-shrink: 0;
-            width: 52px; height: 52px; /* inputと同じ高さに */
+            flex-shrink: 0; /* ボタンは縮めない */
+            width: 50px; 
+            height: 50px;
             border-radius: 50%;
             background: var(--primary-color);
             border: none;
-            color: white;
-            display: flex; justify-content: center; align-items: center;
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(139, 163, 130, 0.3);
-            transition: transform 0.2s, background 0.2s;
-            margin: 0;
-            padding: 0;
+            box-shadow: 0 4px 8px rgba(139, 163, 130, 0.2);
+            padding: 0; /* 余計なパディングを消去 */
         }
-        .search-btn-icon:active { transform: scale(0.95); background: #7a9172; }
-        .search-btn-icon svg { width: 22px; height: 22px; fill: white; }
-        /* ▲▲▲ ここまで ▲▲▲ */
+        
+        .search-btn-icon svg { 
+            width: 24px; 
+            height: 24px; 
+            fill: white;
+            display: block; /* 余白対策 */
+        }
+        /* ▲▲▲ 修正完了 ▲▲▲ */
 
         .tags-container {
-            flex-grow: 1; display: flex; flex-direction: column;
-            justify-content: center; gap: 15px;
-            max-height: 300px; /* タグエリアが広がりすぎないように */
+            display: flex; flex-direction: column;
+            gap: 12px;
         }
         .tags-label { 
-            font-size: 0.9rem; color: #8d8579; 
-            margin-bottom: 5px; font-weight: bold;
-            display: flex; align-items: center; justify-content: center; gap: 5px;
+            font-size: 0.85rem; color: #8d8579; 
+            font-weight: bold;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         .tags-label::before, .tags-label::after {
-            content: ""; display: block; width: 30px; height: 1px; background: #e0dcd5;
+            content: ""; flex: 1; height: 1px; background: #e0dcd5; max-width: 40px;
         }
 
-        .tags { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .tags { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         
         .tag {
-            padding: 14px 5px; /* 文字数が多い時の改行対策 */
-            border-radius: 12px;
-            font-size: 0.85rem; font-weight: 500;
-            cursor: pointer; transition: transform 0.2s, background 0.2s;
+            padding: 12px 5px; border-radius: 12px;
+            font-size: 0.8rem; font-weight: 500;
+            cursor: pointer; transition: 0.2s;
             display: flex; align-items: center; justify-content: center;
             background: #f4f1ea; color: #6b6357; border: 1px solid transparent;
-            width: 100%;
         }
         .tag:active { transform: scale(0.96); }
-
         .tag.mental { background: #eef5f6; color: #5a7d85; }
         .tag.work { background: #fdf5e6; color: #9c7c56; }
         .tag.relation { background: #fbedee; color: #b06d7b; }
@@ -157,22 +154,20 @@
             color: white; border: none; border-radius: 50px;
             font-size: 1.1rem; font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 6px 20px rgba(139, 163, 130, 0.4);
-            transition: transform 0.2s, box-shadow 0.2s;
-            letter-spacing: 0.05em;
+            box-shadow: 0 6px 20px rgba(139, 163, 130, 0.3);
+            transition: 0.2s;
             font-family: 'Zen Maru Gothic', sans-serif;
-            margin-bottom: 10px; /* 下部に少し余裕を */
         }
-        .main-btn:active { transform: scale(0.98); box-shadow: 0 3px 10px rgba(139, 163, 130, 0.4); }
+        .main-btn:active { transform: scale(0.98); }
 
-        /* ▼ モーダル ▼ */
+        /* モーダル */
         .modal-overlay {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
             background: rgba(93, 85, 72, 0.4);
             display: flex; justify-content: center; align-items: center;
             opacity: 0; visibility: hidden;
-            transition: all 0.4s ease; z-index: 1000;
+            transition: 0.4s ease; z-index: 1000;
             backdrop-filter: blur(3px);
         }
         .modal-overlay.active { opacity: 1; visibility: visible; }
@@ -180,99 +175,48 @@
         .modal-card {
             background: #fffcf7;
             width: 88%; max-width: 380px;
-            padding: 40px 30px; 
+            padding: 40px 20px; 
             border-radius: 15px;
             text-align: center;
-            opacity: 0; transform: scale(0.9) translateY(10px);
-            transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            opacity: 0; transform: scale(0.9);
+            transition: 0.5s cubic-bezier(0.22, 1, 0.36, 1);
             box-shadow: 0 15px 40px rgba(0,0,0,0.1);
             position: relative;
             border: 1px solid #eae6df;
         }
         .modal-card::before {
-            content: ""; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px;
+            content: ""; position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px;
             border: 1px dashed #dcd6cb; border-radius: 10px; pointer-events: none;
         }
+        .modal-overlay.active .modal-card { opacity: 1; transform: scale(1); }
 
-        .modal-overlay.active .modal-card { opacity: 1; transform: scale(1) translateY(0); }
-
-        .verse-icon {
-            font-size: 3rem; margin-bottom: 20px; display: block; opacity: 0;
-            color: var(--primary-color);
-        }
+        .verse-icon { font-size: 2.8rem; margin-bottom: 15px; display: block; opacity: 0; color: var(--primary-color); }
         .verse-text {
-            font-family: 'Kiwi Maru', serif; font-size: 1.3rem; line-height: 2;
-            color: #4a4238; margin-bottom: 25px; font-weight: 500; opacity: 0;
+            font-family: 'Kiwi Maru', serif; font-size: 1.25rem; line-height: 1.9;
+            color: #4a4238; margin-bottom: 20px; font-weight: 500; opacity: 0;
         }
-        .verse-ref {
-            font-size: 0.95rem; color: #888; display: block;
-            margin-bottom: 35px; font-weight: bold; opacity: 0;
-            font-family: 'Zen Maru Gothic', sans-serif;
-        }
+        .verse-ref { font-size: 0.9rem; color: #888; display: block; margin-bottom: 30px; font-weight: bold; opacity: 0; }
 
-        /* ▼ シェアボタン ▼ */
-        .share-container {
-            display: flex; justify-content: center; gap: 18px;
-            margin-bottom: 35px; opacity: 0;
-            position: relative; z-index: 2;
-        }
-
-        .share-btn {
-            width: 50px; height: 50px;
-            border-radius: 50%; border: none;
-            cursor: pointer;
-            display: flex; justify-content: center; align-items: center;
-            transition: transform 0.2s, background 0.2s;
-            padding: 0;
-            background: #f0ece6;
-        }
-        .share-btn:hover { transform: translateY(-2px); background: #e6e0d6; }
-        .share-btn:active { transform: scale(0.95); }
-
-        .share-btn svg { width: 24px; height: 24px; transition: fill 0.2s; }
-
-        .share-btn.copy svg { fill: #888; }
-        .share-btn.x svg { fill: #333; }
+        .share-container { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; opacity: 0; position: relative; z-index: 2; }
+        .share-btn { width: 48px; height: 48px; border-radius: 50%; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; background: #f0ece6; }
+        .share-btn:active { transform: scale(0.92); }
+        .share-btn svg { width: 22px; height: 22px; fill: #888; }
         .share-btn.line svg { fill: #00b900; }
         .share-btn.insta svg { fill: #d62976; }
+        .share-btn.x svg { fill: #333; }
 
-        .close-btn {
-            background: transparent;
-            color: #8d8579; border: 1px solid #dcd6cb;
-            padding: 12px 35px; border-radius: 30px;
-            font-size: 0.95rem; cursor: pointer; font-weight: bold;
-            transition: all 0.2s;
-            position: relative; z-index: 2;
-            font-family: 'Zen Maru Gothic', sans-serif;
-        }
-        .close-btn:hover { background: #f9f7f2; color: #5d5548; border-color: #b0a99f; }
+        .close-btn { background: transparent; color: #8d8579; border: 1px solid #dcd6cb; padding: 12px 30px; border-radius: 30px; font-size: 0.9rem; cursor: pointer; font-weight: bold; position: relative; z-index: 2; }
 
-        /* トースト */
-        .toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: rgba(93, 85, 72, 0.95); color: #fffcf7;
-            padding: 12px 24px; border-radius: 50px; font-size: 0.9rem;
-            opacity: 0; visibility: hidden; transition: all 0.3s;
-            z-index: 2000; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            font-family: 'Zen Maru Gothic', sans-serif;
-        }
-        .toast.show { opacity: 1; visibility: visible; bottom: 50px; }
+        .toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: rgba(93, 85, 72, 0.95); color: #fffcf7; padding: 12px 24px; border-radius: 50px; font-size: 0.85rem; opacity: 0; visibility: hidden; transition: 0.3s; z-index: 2000; }
+        .toast.show { opacity: 1; visibility: visible; }
 
         @keyframes floatUp {
-            0% { opacity: 0; transform: translateY(15px); filter: blur(3px); }
+            0% { opacity: 0; transform: translateY(10px); filter: blur(2px); }
             100% { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
-        .animate-in { animation: floatUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .animate-in { animation: floatUp 0.8s forwards; }
 
-        .footer { font-size: 0.7rem; color: #b0a99f; margin-top: 10px; }
-        
-        /* 画面が小さい端末（iPhone SEなど）向けの微調整 */
-        @media (max-height: 700px) {
-            .container { height: 96dvh; padding: 20px; }
-            .tags-container { gap: 10px; }
-            .verse-icon { font-size: 2.5rem; margin-bottom: 10px; }
-            .verse-text { font-size: 1.1rem; margin-bottom: 15px; }
-        }
+        .footer { font-size: 0.65rem; color: #b0a99f; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -293,10 +237,10 @@
         <div class="tags-container">
             <div class="tags-label">カテゴリから選ぶ</div>
             <div class="tags">
-                <div class="tag mental" onclick="filterByCategory('mental')">☁️ 不安・メンタル</div>
-                <div class="tag work" onclick="filterByCategory('work')">💼 仕事・キャリア</div>
-                <div class="tag relation" onclick="filterByCategory('relation')">🤝 人間関係・愛</div>
-                <div class="tag self" onclick="filterByCategory('self')">🪞 自分・自信</div>
+                <div class="tag mental" onclick="filterByCategory('mental')">☁️ メンタル</div>
+                <div class="tag work" onclick="filterByCategory('work')">💼 お仕事</div>
+                <div class="tag relation" onclick="filterByCategory('relation')">🤝 人間関係</div>
+                <div class="tag self" onclick="filterByCategory('self')">🪞 自分自身</div>
                 <div class="tag future" onclick="filterByCategory('future')">✨ 将来・決断</div>
                 <div class="tag life" onclick="filterByCategory('life')">💸 お金・試練</div>
             </div>
@@ -312,22 +256,20 @@
             <span class="verse-icon">🌿</span>
             <div class="verse-text" id="modalText"></div>
             <span class="verse-ref" id="modalRef"></span>
-
             <div class="share-container" id="shareButtons">
-                <button class="share-btn copy" onclick="shareAction('copy')" title="コピー">
+                <button class="share-btn copy" onclick="shareAction('copy')">
                     <svg viewBox="0 0 24 24"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg>
                 </button>
-                <button class="share-btn x" onclick="shareAction('x')" title="Xでシェア">
+                <button class="share-btn x" onclick="shareAction('x')">
                     <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                 </button>
-                <button class="share-btn line" onclick="shareAction('line')" title="LINEで送る">
+                <button class="share-btn line" onclick="shareAction('line')">
                     <svg viewBox="0 0 24 24"><path d="M22,10.8C22,5.9 17.5,2 12,2C6.5,2 2,5.9 2,10.8C2,14.8 4.7,18.3 8.6,19.3C9.1,19.4 9.4,19.7 9.3,20.2C9.3,20.2 9.1,21.3 9.1,21.4C9,21.8 9,22 9.3,22.1C9.6,22.1 10,21.9 10.2,21.8C10.2,21.8 15.3,18.4 15.3,18.4C19.4,16.5 22,13.8 22,10.8M12,14C11.4,14 11,13.6 11,13V9C11,8.4 11.4,8 12,8C12.6,8 13,8.4 13,9V13C13,13.6 12.6,14 12,14M8.5,14H6.5C5.9,14 5.5,13.6 5.5,13V9C5.5,8.4 5.9,8 6.5,8H8.5C9.1,8 9.5,8.4 9.5,9V13C9.5,13.6 9.1,14 8.5,14M17.5,14H15.5C14.9,14 14.5,13.6 14.5,13V9C14.5,8.4 14.9,8 15.5,8H17.5C18.1,8 18.5,8.4 18.5,9V13C18.5,13.6 18.1,14 17.5,14Z"/></svg>
                 </button>
-                <button class="share-btn insta" onclick="shareAction('insta')" title="Instagramを開く">
+                <button class="share-btn insta" onclick="shareAction('insta')">
                     <svg viewBox="0 0 24 24"><path d="M7.8,2H16.2C19.4,2 22,4.6 22,7.8V16.2A5.8,5.8 0 0,1 16.2,22H7.8C4.6,22 2,19.4 2,16.2V7.8A5.8,5.8 0 0,1 7.8,2M7.6,4A3.6,3.6 0 0,0 4,7.6V16.4C4,18.39 5.61,20 7.6,20H16.4A3.6,3.6 0 0,0 20,16.4V7.6C20,5.61 18.39,4 16.4,4H7.6M17.25,5.5A1.25,1.25 0 0,1 18.5,6.75A1.25,1.25 0 0,1 17.25,8A1.25,1.25 0 0,1 16,6.75A1.25,1.25 0 0,1 17.25,5.5M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z"/></svg>
                 </button>
             </div>
-
             <button class="close-btn" onclick="closeModalButton()">閉じる</button>
         </div>
     </div>
@@ -335,178 +277,158 @@
     <div class="toast" id="toast">コピーしました！</div>
 
     <script>
-        // データ埋め込み
         const bibleVerses = [
-  { "category": "mental", "keywords": ["不安", "明日", "心配", "今日"], "text": "明日のことまで心配しなくてよいのです。明日のことは明日が心配します。労苦はその日その日に十分あります。", "ref": "マタイ 6:34" },
-  { "category": "mental", "keywords": ["重荷", "疲れ", "休み", "回復"], "text": "すべて、疲れた人、重荷を負っている人は、わたしのところに来なさい。わたしがあなたがたを休ませてあげます。", "ref": "マタイ 11:28" },
-  { "category": "mental", "keywords": ["恐れ", "価値", "大切", "安心"], "text": "恐れることはありません。あなたがたは、たくさんの雀よりもすぐれた者です。", "ref": "マタイ 10:31" },
-  { "category": "mental", "keywords": ["平和", "混乱", "落ち着き"], "text": "神は混乱の神ではなく、平和の神だからです。", "ref": "1コリント 14:33" },
-  { "category": "mental", "keywords": ["慰め", "苦しみ", "支え", "優しさ"], "text": "神は、私たちのあらゆる苦しみのときに、私たちを慰めてくださいます。", "ref": "2コリント 1:4" },
-  { "category": "mental", "keywords": ["弱さ", "恵み", "肯定", "強がり"], "text": "「わたしの恵みは、あなたに十分である。というのは、わたしの力は、弱さのうちに完全に現れるからである。」", "ref": "2コリント 12:9" },
-  { "category": "mental", "keywords": ["平安", "守り", "思考", "ガード"], "text": "人間のすべての理解を超えた神の平安が、あなたがたの心と思いを、キリスト・イエスにあって守ってくれます。", "ref": "ピリピ 4:7" },
-  { "category": "mental", "keywords": ["思い煩い", "祈り", "感謝", "願い"], "text": "何も思い煩わないで、あらゆる場合に、感謝をもってささげる祈りと願いによって、あなたがたの願い事を神に知っていただきなさい。", "ref": "ピリピ 4:6" },
-  { "category": "mental", "keywords": ["孤独", "味方", "強さ", "敵"], "text": "神が私たちの味方であるなら、だれが私たちに敵対できるでしょう。", "ref": "ローマ 8:31" },
-  { "category": "mental", "keywords": ["心", "穏やか", "霊", "平和"], "text": "御霊の思いは、いのちと平安です。", "ref": "ローマ 8:6" },
-  { "category": "mental", "keywords": ["勇気", "恐れ", "愛", "力"], "text": "神が私たちに与えてくださったものは、おくびょうの霊ではなく、力と愛と慎みの霊です。", "ref": "2テモテ 1:7" },
-  { "category": "mental", "keywords": ["心配", "ケア", "ゆだねる", "重荷"], "text": "あなたがたの思い煩いを、いっさい神にゆだねなさい。神があなたがたのことを心配してくださるからです。", "ref": "1ペテロ 5:7" },
-  { "category": "mental", "keywords": ["愛", "恐れ", "締め出す", "安心"], "text": "愛には恐れがありません。全き愛は恐れを締め出します。", "ref": "1ヨハネ 4:18" },
-  { "category": "mental", "keywords": ["自分を責める", "良心", "赦し"], "text": "たとい私たちの心が責めたとしても、神は私たちの心よりも大きく、すべてをご存じだからです。", "ref": "1ヨハネ 3:20" },
-  { "category": "mental", "keywords": ["動揺", "信じる", "心"], "text": "あなたがたは心を騒がせてはいけません。神を信じ、またわたしを信じなさい。", "ref": "ヨハネ 14:1" },
-  { "category": "mental", "keywords": ["平安", "残す", "贈り物", "プレゼント"], "text": "わたしは、あなたがたに平安を残します。わたしは、あなたがたにわたしの平安を与えます。", "ref": "ヨハネ 14:27" },
-  { "category": "mental", "keywords": ["喜び", "満たされる", "元気"], "text": "わたしの喜びがあなたがたのうちにあり、あなたがたの喜びが満たされるようになるためです。", "ref": "ヨハネ 15:11" },
-  { "category": "mental", "keywords": ["勝利", "勇気", "世", "克服"], "text": "あなたがたは世にあっては患難があります。しかし、勇気を出しなさい。わたしはすでに世に勝っているのです。", "ref": "ヨハネ 16:33" },
-  { "category": "mental", "keywords": ["安心", "助け", "恐れない"], "text": "主は私を助けてくださる。私は恐れない。人が私に何ができようか。", "ref": "ヘブル 13:6" },
-  { "category": "mental", "keywords": ["悩み", "迷い", "二心"], "text": "心が定まらないために、その歩みのすべてに動揺する人です。", "ref": "ヤコブ 1:8" },
-  { "category": "work", "keywords": ["光", "良い行い", "影響力", "模範"], "text": "あなたがたの光を人々の前で輝かせ、人々があなたがたの良い行いを見て、天におられるあなたがたの父をあがめるようにしなさい。", "ref": "マタイ 5:16" },
-  { "category": "work", "keywords": ["報い", "隠れたこと", "評価"], "text": "隠れた所を見ておられるあなたの父が、あなたに報いてくださいます。", "ref": "マタイ 6:4" },
-  { "category": "work", "keywords": ["忠実", "小さいこと", "信頼"], "text": "ごく小さな事に忠実な人は、大きな事にも忠実であり、ごく小さな事に不忠実な人は、大きな事にも不忠実です。", "ref": "ルカ 16:10" },
-  { "category": "work", "keywords": ["真理", "自由", "本質"], "text": "あなたがたは真理を知り、真理はあなたがたを自由にします。", "ref": "ヨハネ 8:32" },
-  { "category": "work", "keywords": ["熱心", "仕える", "パッション"], "text": "熱心で、うむことなく、霊に燃え、主に仕えなさい。", "ref": "ローマ 12:11" },
-  { "category": "work", "keywords": ["管理者", "責任", "誠実"], "text": "管理者に要求されることは、忠実だ、と認められることです。", "ref": "1コリント 4:2" },
-  { "category": "work", "keywords": ["目的", "栄光", "理由"], "text": "食べるにも、飲むにも、何をするにも、ただ神の栄光のためにしなさい。", "ref": "1コリント 10:31" },
-  { "category": "work", "keywords": ["役割", "チーム", "必要"], "text": "目、手に向かって「あなたは必要ない」と言うことはできないし、頭も足に向かって「あなたは必要ない」と言うことはできません。", "ref": "1コリント 12:21" },
-  { "category": "work", "keywords": ["秩序", "適切", "整理"], "text": "すべてのことを、適切に、秩序正しく行いなさい。", "ref": "1コリント 14:40" },
-  { "category": "work", "keywords": ["堅実", "動じない", "無駄じゃない"], "text": "堅く立って、動かされることなく、いつも主のわざに励みなさい。あなたがたの労苦は、主にあってむだではないからです。", "ref": "1コリント 15:58" },
-  { "category": "work", "keywords": ["機会", "時間", "活用"], "text": "機会を十分に生かして用いなさい。悪い時代だからです。", "ref": "エペソ 5:16" },
-  { "category": "work", "keywords": ["本心", "心から", "奉仕"], "text": "うわべだけの奉仕ではなく、キリストのしもべとして、心から神のみこころを行いなさい。", "ref": "エペソ 6:6" },
-  { "category": "work", "keywords": ["すべて", "主", "仕事"], "text": "何をするにも、人に対してではなく、主に仕えるように、心からしなさい。", "ref": "コロサイ 3:23" },
-  { "category": "work", "keywords": ["会話", "知恵", "対応"], "text": "あなたがたの会話は、いつも慈しみに満ちた、塩で味つけされたものでありなさい。", "ref": "コロサイ 4:6" },
-  { "category": "work", "keywords": ["落ち着き", "仕事", "自立"], "text": "落ち着いた生活をし、自分の仕事に励み、自分の手で働きなさい。", "ref": "1テサロニケ 4:11" },
-  { "category": "work", "keywords": ["働く", "規律", "怠惰"], "text": "働きたくない者は、食べることもしてはならない。", "ref": "2テサロニケ 3:10" },
-  { "category": "work", "keywords": ["報酬", "給料", "権利"], "text": "聖書に「働き人が報酬を受けるのは当然である」と言われているからです。", "ref": "1テモテ 5:18" },
-  { "category": "work", "keywords": ["熟練", "恥じない", "真理"], "text": "あなたは、熟練した者、恥じるところのない働き人として、自分を神にささげるように励みなさい。", "ref": "2テモテ 2:15" },
-  { "category": "work", "keywords": ["準備", "良い業", "スタンバイ"], "text": "支配者と権威とに服従し、これに従い、すべての良いわざをなす準備ができていなさい。", "ref": "テトス 3:1" },
-  { "category": "work", "keywords": ["実行", "行動", "うっかり"], "text": "みことばを行う人になりなさい。自分を欺いて、ただ聞くだけの者となってはいけません。", "ref": "ヤコブ 1:22" },
-  { "category": "relation", "keywords": ["平和", "子供", "仲介"], "text": "平和をつくる者は幸いです。その人たちは神の子供と呼ばれるからです。", "ref": "マタイ 5:9" },
-  { "category": "relation", "keywords": ["敵", "祈り", "愛"], "text": "自分の敵を愛し、自分を迫害する者のために祈りなさい。", "ref": "マタイ 5:44" },
-  { "category": "relation", "keywords": ["黄金律", "ルール", "相手"], "text": "何事でも、自分にしてもらいたいことは、ほかの人にもそのようにしなさい。", "ref": "マタイ 7:12" },
-  { "category": "relation", "keywords": ["赦し", "何度でも", "リセット"], "text": "「七回を七十倍するまで赦しなさい。」", "ref": "マタイ 18:22" },
-  { "category": "relation", "keywords": ["仕える", "リーダー", "謙虚"], "text": "あなたがたの間で偉くなりたいと思う者は、みなに仕える者になりなさい。", "ref": "マルコ 10:43" },
-  { "category": "relation", "keywords": ["裁かない", "批判", "ブーメラン"], "text": "人をさばくな。そうすれば、自分もさばかれません。人を罪に定めるな。そうすれば、自分も罪に定められません。", "ref": "ルカ 6:37" },
-  { "category": "relation", "keywords": ["愛", "掟", "互いに"], "text": "わたしがあなたがたを愛したように、あなたがたも互いに愛し合いなさい。", "ref": "ヨハネ 13:34" },
-  { "category": "relation", "keywords": ["友", "犠牲", "最高"], "text": "人がその友のためにいのちを捨てるという、これよりも大きな愛はだれも持っていません。", "ref": "ヨハネ 15:13" },
-  { "category": "relation", "keywords": ["尊敬", "優先", "マナー"], "text": "兄弟愛をもって互いに深く慈しみ、互いに相手を自分より優れた者として敬いなさい。", "ref": "ローマ 12:10" },
-  { "category": "relation", "keywords": ["共感", "泣く", "笑う"], "text": "喜ぶ者とともに喜び、泣く者とともに泣きなさい。", "ref": "ローマ 12:15" },
-  { "category": "relation", "keywords": ["平和", "努力", "全方位"], "text": "できるならば、自分側から、すべての人と平和を保ちなさい。", "ref": "ローマ 12:18" },
-  { "category": "relation", "keywords": ["一致", "心", "チームワーク"], "text": "みな同じことを語り、あなたがたの間に分裂のないようにしなさい。", "ref": "1コリント 1:10" },
-  { "category": "relation", "keywords": ["愛", "忍耐", "親切"], "text": "愛は寛容であり、愛は親切です。また人をねたみません。愛は自慢せず、高ぶりません。", "ref": "1コリント 13:4" },
-  { "category": "relation", "keywords": ["重荷", "助け合い", "シェア"], "text": "互いの重荷を負い合いなさい。そうすることによって、キリストの律法を全うするのです。", "ref": "ガラテヤ 6:2" },
-  { "category": "relation", "keywords": ["寛容", "我慢", "愛"], "text": "愛のゆえに互いに忍び合いなさい。", "ref": "エペソ 4:2" },
-  { "category": "relation", "keywords": ["言葉", "徳", "恵み"], "text": "悪いことばを、いっさい口から出してはいけません。ただ、徳を高めるのに役に立つことばを語りなさい。", "ref": "エペソ 4:29" },
-  { "category": "relation", "keywords": ["親切", "赦し", "優しさ"], "text": "互いに親切にし、優しい心で接し、神がキリストにおいてあなたがたを赦してくださったように、互いに赦し合いなさい。", "ref": "エペソ 4:32" },
-  { "category": "relation", "keywords": ["謙遜", "他者評価", "自己中心"], "text": "何事も利己的な思いや虚栄からするのではなく、謙遜になって、互いに人を自分よりもすぐれた者と思いなさい。", "ref": "ピリピ 2:3" },
-  { "category": "relation", "keywords": ["励まし", "向上", "ポジティブ"], "text": "互いに励まし合い、高め合いなさい。", "ref": "1テサロニケ 5:11" },
-  { "category": "relation", "keywords": ["聞く", "話す", "怒り"], "text": "だれでも、聞くのに早く、語るのに遅く、怒るのに遅くありなさい。", "ref": "ヤコブ 1:19" },
-  { "category": "self", "keywords": ["価値", "雀", "髪の毛"], "text": "あなたがたの頭の毛までも、みな数えられています。だから恐れることはありません。あなたがたは、たくさんの雀よりもすぐれた者です。", "ref": "マタイ 10:30-31" },
-  { "category": "self", "keywords": ["子供", "特権", "受け入れる"], "text": "しかし、この方を受け入れた人々、すなわち、その名を信じた人々には、神の子供となる特権をお与えになった。", "ref": "ヨハネ 1:12" },
-  { "category": "self", "keywords": ["選ばれた", "任命", "実"], "text": "あなたがたがわたしを選んだのではなく、わたしがあなたがたを選び、任命したのです。", "ref": "ヨハネ 15:16" },
-  { "category": "self", "keywords": ["新しい", "命", "洗礼"], "text": "私たちは、キリストの死にあずかるバプテスマによって、キリストとともに葬られたのです。…新しいいのちに歩むためです。", "ref": "ローマ 6:4" },
-  { "category": "self", "keywords": ["神の子", "導き", "霊"], "text": "神の御霊に導かれる人は、だれでも神の子供です。", "ref": "ローマ 8:14" },
-  { "category": "self", "keywords": ["勝利", "圧倒的", "愛"], "text": "私たちは、私たちを愛してくださった方によって、これらすべてのことにおいて、圧倒的な勝利者となるのです。", "ref": "ローマ 8:37" },
-  { "category": "self", "keywords": ["宮", "聖霊", "尊い"], "text": "あなたがたは神の宮であり、神の御霊があなたがたの内に宿っておられることを、知らないのですか。", "ref": "1コリント 3:16" },
-  { "category": "self", "keywords": ["賜物", "個性", "恵み"], "text": "私は、神の恵みによって、今の私になりました。", "ref": "1コリント 15:10" },
-  { "category": "self", "keywords": ["変えられる", "栄光", "鏡"], "text": "私たちはみな…鏡のように主の栄光を反映させながら、栄光から栄光へと、主と同じ姿に変えられていきます。", "ref": "2コリント 3:18" },
-  { "category": "self", "keywords": ["土の器", "宝", "力"], "text": "私たちは、この宝を土の器の中に入れています。それは、この測り知れない力が神のものであって、私たちから出たものでないことが明らかになるためです。", "ref": "2コリント 4:7" },
-  { "category": "self", "keywords": ["内なる人", "日々", "更新"], "text": "たとい私たちの外なる人は衰えても、内なる人は日々新しくされています。", "ref": "2コリント 4:16" },
-  { "category": "self", "keywords": ["新しい創造", "リセット", "過去"], "text": "だれでもキリストにあるならば、その人は新しく造られた者です。古いものは過ぎ去り、見よ、すべてが新しくなりました。", "ref": "2コリント 5:17" },
-  { "category": "self", "keywords": ["自由", "解放", "くびき"], "text": "キリストは、自由を得させるために、私たちを解放してくださいました。", "ref": "ガラテヤ 5:1" },
-  { "category": "self", "keywords": ["選定", "聖なる", "傷がない"], "text": "神は世界の基が置かれる前から、キリストにあって私たちを選び、御前に聖なる、傷のない者にしようとされたのです。", "ref": "エペソ 1:4" },
-  { "category": "self", "keywords": ["作品", "傑作", "善い行い"], "text": "私たちは神の作品であって、良い行いをするためにキリスト・イエスにあって造られたのです。", "ref": "エペソ 2:10" },
-  { "category": "self", "keywords": ["国籍", "天", "市民"], "text": "私たちの国籍は天にあります。", "ref": "ピリピ 3:20" },
-  { "category": "self", "keywords": ["力", "できる", "強さ"], "text": "私は、私を強くしてくださる方によって、どんなことでもできるのです。", "ref": "ピリピ 4:13" },
-  { "category": "self", "keywords": ["愛される", "選ばれた", "聖なる"], "text": "あなたがたは神に選ばれた者、聖なる、愛されている者です。", "ref": "コロサイ 3:12" },
-  { "category": "self", "keywords": ["王", "祭司", "所有"], "text": "しかし、あなたがたは選ばれた種族、王である祭司、聖なる国民、神の所有とされた民です。", "ref": "1ペテロ 2:9" },
-  { "category": "self", "keywords": ["愛", "神の子", "呼ばれる"], "text": "私たちが神の子供と呼ばれるために、御父がどんなにすばらしい愛を与えてくださったかを、考えなさい。", "ref": "1ヨハネ 3:1" },
-  { "category": "future", "keywords": ["探す", "門", "開く"], "text": "求めなさい。そうすれば与えられます。探しなさい。そうすれば見つかります。たたきなさい。そうすれば開かれます。", "ref": "マタイ 7:7" },
-  { "category": "future", "keywords": ["狭い門", "道", "命"], "text": "狭い門から入りなさい。…いのちに至る門は小さく、その道は狭く、それを見いだす者はまれです。", "ref": "マタイ 7:13-14" },
-  { "category": "future", "keywords": ["道", "真理", "命"], "text": "イエスは彼に言われた。「わたしが道であり、真理であり、いのちなのです。」", "ref": "ヨハネ 14:6" },
-  { "category": "future", "keywords": ["報い", "忍耐", "永遠"], "text": "忍耐して善を行い、栄光と誉れと不滅のものを求める者には、永遠のいのちを与え…。", "ref": "ローマ 2:7" },
-  { "category": "future", "keywords": ["希望", "失望", "愛"], "text": "この希望は失望に終わることがありません。", "ref": "ローマ 5:5" },
-  { "category": "future", "keywords": ["導き", "神の子", "霊"], "text": "神の御霊に導かれる人は、だれでも神の子供です。", "ref": "ローマ 8:14" },
-  { "category": "future", "keywords": ["知恵", "深さ", "知識"], "text": "ああ、神の知恵と知識の富は、なんと深いことでしょう。", "ref": "ローマ 11:33" },
-  { "category": "future", "keywords": ["変えられる", "心", "神の御心"], "text": "心を新たにすることで、自分を変えなさい。そうすれば、神の御心が…何であるかがわかります。", "ref": "ローマ 12:2" },
-  { "category": "future", "keywords": ["希望", "喜び", "力"], "text": "どうか、望みの神が、…あなたがたを喜びと平安で満たし、聖霊の力によって望みにあふれさせてくださいますように。", "ref": "ローマ 15:13" },
-  { "category": "future", "keywords": ["目", "耳", "心"], "text": "目がまだ見ず、耳がまだ聞かず、人の心に思い浮かびもしなかったことを、神は、ご自分を愛する者たちのために備えられた。", "ref": "1コリント 2:9" },
-  { "category": "future", "keywords": ["歩み", "信仰", "見えるもの"], "text": "私たちは、見えるものによらず、信仰によって歩むからです。", "ref": "2コリント 5:7" },
-  { "category": "future", "keywords": ["完成", "確信", "始まり"], "text": "あなたがたの内に良いわざを始められた方は、キリスト・イエスの日が来るまでに、それを完成させてくださるに違いないと、私は確信しています。", "ref": "ピリピ 1:6" },
-  { "category": "future", "keywords": ["目標", "賞", "走る"], "text": "私は、目標を目ざして一心に走っているのです。", "ref": "ピリピ 3:14" },
-  { "category": "future", "keywords": ["望み", "天", "福音"], "text": "あなたがたのために天に蓄えられている望みのゆえです。", "ref": "コロサイ 1:5" },
-  { "category": "future", "keywords": ["約束", "誠実", "真実"], "text": "約束された方は真実な方ですから、動揺しないようにしましょう。", "ref": "ヘブル 10:23" },
-  { "category": "future", "keywords": ["信仰", "保証", "確信"], "text": "信仰は望んでいる事がらを保証し、目に見えないものを確信させるものです。", "ref": "ヘブル 11:1" },
-  { "category": "future", "keywords": ["都", "永遠", "探し求める"], "text": "私たちは、この地上に永遠の都を持たず、きたるべき都を探し求めているのです。", "ref": "ヘブル 13:14" },
-  { "category": "future", "keywords": ["知恵", "願い", "与える"], "text": "あなたがたの中に知恵の欠けた人がいるなら、その人は、だれにでも惜しげなく、とがめることなく与えてくださる神に願いなさい。", "ref": "ヤコブ 1:5" },
-  { "category": "future", "keywords": ["計画", "主の御心", "生きる"], "text": "あなたがたは、「主のみこころであれば、私たちは生き、このこと、あるいはあのことをしよう」と言うべきです。", "ref": "ヤコブ 4:15" },
-  { "category": "future", "keywords": ["永遠", "御心", "過ぎ去る"], "text": "世と世の欲は過ぎ去ります。しかし、神のみこころを行う者は永遠に生き続けます。", "ref": "1ヨハネ 2:17" },
-  { "category": "life", "keywords": ["空の鳥", "養う", "価値"], "text": "空の鳥を見なさい。種蒔きもせず、刈り入れもしません。…しかし、あなたがたの天の父は、それを養っていてくださいます。", "ref": "マタイ 6:26" },
-  { "category": "life", "keywords": ["必要", "知っている", "求める"], "text": "神の国とその義とをまず第一に求めなさい。そうすれば、これらのものはすべて、それに加えて与えられます。", "ref": "マタイ 6:33" },
-  { "category": "life", "keywords": ["宝", "天", "心"], "text": "自分の宝を地上にたくわえてはいけません。…自分の宝を天にたくわえなさい。", "ref": "マタイ 6:19-20" },
-  { "category": "life", "keywords": ["二人の主人", "富", "神"], "text": "あなたがたは、神と富との両方に仕えることはできません。", "ref": "マタイ 6:24" },
-  { "category": "life", "keywords": ["家", "岩", "嵐"], "text": "雨が降り、川があふれ、風が吹いてその家に打ちつけたが、倒れませんでした。岩の上に土台が据えられていたからです。", "ref": "マタイ 7:25" },
-  { "category": "life", "keywords": ["貪欲", "命", "持ち物"], "text": "どんな貪欲にも注意して、警戒しなさい。人のいのちは、持ち物がいかに豊かであるかということにあるのではないからです。", "ref": "ルカ 12:15" },
-  { "category": "life", "keywords": ["苦難", "忍耐", "練達"], "text": "患難が忍耐を生み出し、忍耐が練られた品性を生み出し、練られた品性が希望を生み出す。", "ref": "ローマ 5:3-4" },
-  { "category": "life", "keywords": ["苦しみ", "栄光", "比較"], "text": "現在の苦しみは、将来私たちに現される栄光に比べれば、取るに足りないものだと私は考えます。", "ref": "ローマ 8:18" },
-  { "category": "life", "keywords": ["試練", "脱出", "耐える"], "text": "神は真実な方ですから、あなたがたを耐えられないほどの試練に会わせることはなさいません。", "ref": "1コリント 10:13" },
-  { "category": "life", "keywords": ["一時的", "永遠", "重み"], "text": "今の時の軽い患難は、私たちのうちに働いて、測り知れない、重い永遠の栄光をもたらすからです。", "ref": "2コリント 4:17" },
-  { "category": "life", "keywords": ["種まき", "刈り取り", "法則"], "text": "人は自分の蒔いたものを、また刈り取ることになるのです。", "ref": "ガラテヤ 6:7" },
-  { "category": "life", "keywords": ["欠乏", "豊かさ", "秘訣"], "text": "私は、貧しさの中にいる道も知っており、豊かさの中にいる道も知っています。", "ref": "ピリピ 4:12" },
-  { "category": "life", "keywords": ["必要", "満たす", "供給"], "text": "私の神は、キリスト・イエスにあるご自身の栄光の富をもって、あなたがたの必要をすべて満たしてくださいます。", "ref": "ピリピ 4:19" },
-  { "category": "life", "keywords": ["満足", "敬虔", "利益"], "text": "満ち足りる心を伴う敬虔こそ、大きな利益を受ける道です。", "ref": "1テモテ 6:6" },
-  { "category": "life", "keywords": ["持ち込み", "持ち出し", "裸"], "text": "私たちは、何一つこの世に持って来なかったし、また、何一つ持って出ることもできません。", "ref": "1テモテ 6:7" },
-  { "category": "life", "keywords": ["金銭欲", "悪", "迷い"], "text": "金銭を愛することが、あらゆる悪の根です。", "ref": "1テモテ 6:10" },
-  { "category": "life", "keywords": ["富", "高慢", "望み"], "text": "この世で富んでいる人たちに命じなさい。高ぶらないように、また、定かでない富に希望を置かないように。", "ref": "1テモテ 6:17" },
-  { "category": "life", "keywords": ["完走", "戦い", "信仰"], "text": "私は勇敢に戦い、走るべき道のりを走り終え、信仰を守り通しました。", "ref": "2テモテ 4:7" },
-  { "category": "life", "keywords": ["不変", "昨日", "今日"], "text": "イエス・キリストは、昨日も今日も、いつまでも変わることがありません。", "ref": "ヘブル 13:8" },
-  { "category": "life", "keywords": ["試練", "喜び", "成長"], "text": "私の兄弟たち。さまざまな試練に会うときは、それをこの上ない喜びと思いなさい。", "ref": "ヤコブ 1:2" }
+            { "category": "mental", "keywords": ["不安", "明日", "心配"], "text": "明日のことまで心配しなくてよいのです。明日のことは明日が心配します。", "ref": "マタイ 6:34" },
+            { "category": "mental", "keywords": ["重荷", "疲れ", "休み"], "text": "すべて、疲れた人、重荷を負っている人は、わたしのところに来なさい。わたしがあなたがたを休ませてあげます。", "ref": "マタイ 11:28" },
+            { "category": "mental", "keywords": ["恐れ", "価値", "大切"], "text": "恐れることはありません。あなたがたは、たくさんの雀よりもすぐれた者です。", "ref": "マタイ 10:31" },
+            { "category": "mental", "keywords": ["平和", "混乱", "落ち着き"], "text": "神は混乱の神ではなく、平和の神だからです。", "ref": "1コリント 14:33" },
+            { "category": "mental", "keywords": ["慰め", "苦しみ", "支え"], "text": "神は、私たちのあらゆる苦しみのときに、私たちを慰めてくださいます。", "ref": "2コリント 1:4" },
+            { "category": "mental", "keywords": ["弱さ", "恵み", "肯定"], "text": "「わたしの恵みは、あなたに十分である。わたしの力は、弱さのうちに完全に現れるからである。」", "ref": "2コリント 12:9" },
+            { "category": "mental", "keywords": ["平安", "守り", "思考"], "text": "すべての理解を超えた神の平安が、あなたがたの心と思いを守ってくれます。", "ref": "ピリピ 4:7" },
+            { "category": "mental", "keywords": ["思い煩い", "祈り", "感謝"], "text": "何も思い煩わないで、あらゆる場合に感謝をもって祈り、願い事を神に知っていただきなさい。", "ref": "ピリピ 4:6" },
+            { "category": "mental", "keywords": ["孤独", "味方", "強さ"], "text": "神が私たちの味方であるなら、だれが私たちに敵対できるでしょう。", "ref": "ローマ 8:31" },
+            { "category": "mental", "keywords": ["心", "穏やか", "霊"], "text": "御霊の思いは、いのちと平安です。", "ref": "ローマ 8:6" },
+            { "category": "mental", "keywords": ["勇気", "恐れ", "愛"], "text": "神が与えてくださったものは、おくびょうの霊ではなく、力と愛と慎みの霊です。", "ref": "2テモテ 1:7" },
+            { "category": "mental", "keywords": ["心配", "ゆだねる", "重荷"], "text": "あなたがたの思い煩いを、いっさい神にゆだねなさい。神があなたがたのことを心配してくださるからです。", "ref": "1ペテロ 5:7" },
+            { "category": "mental", "keywords": ["愛", "恐れ", "安心"], "text": "愛には恐れがありません。全き愛は恐れを締め出します。", "ref": "1ヨハネ 4:18" },
+            { "category": "mental", "keywords": ["自分を責める", "良心", "赦し"], "text": "たとい私たちの心が責めたとしても、神は私たちの心よりも大きく、すべてをご存じです。", "ref": "1ヨハネ 3:20" },
+            { "category": "mental", "keywords": ["動揺", "信じる", "心"], "text": "あなたがたは心を騒がせてはいけません。神を信じ、またわたしを信じなさい。", "ref": "ヨハネ 14:1" },
+            { "category": "mental", "keywords": ["平安", "残す", "贈り物"], "text": "わたしは、あなたがたに平安を残します。わたしは、あなたがたにわたしの平安を与えます。", "ref": "ヨハネ 14:27" },
+            { "category": "mental", "keywords": ["喜び", "満たされる", "元気"], "text": "わたしの喜びがあなたがたのうちにあり、喜びが満たされるようになるためです。", "ref": "ヨハネ 15:11" },
+            { "category": "mental", "keywords": ["勝利", "勇気", "世"], "text": "あなたがたは世にあっては患難があります。しかし勇気を出しなさい。わたしはすでに世に勝っているのです。", "ref": "ヨハネ 16:33" },
+            { "category": "mental", "keywords": ["安心", "助け", "恐れない"], "text": "主は私を助けてくださる。私は恐れない。人が私に何ができようか。", "ref": "ヘブル 13:6" },
+            { "category": "mental", "keywords": ["悩み", "迷い", "二心"], "text": "心が定まらないために、その歩みのすべてに動揺する人です。", "ref": "ヤコブ 1:8" },
+            { "category": "work", "keywords": ["光", "良い行い", "影響力"], "text": "あなたがたの光を人々の前で輝かせ、人々があなたがたの良い行いを見て、天の父をあがめるようにしなさい。", "ref": "マタイ 5:16" },
+            { "category": "work", "keywords": ["報い", "隠れたこと", "評価"], "text": "隠れた所を見ておられるあなたの父が、あなたに報いてくださいます。", "ref": "マタイ 6:4" },
+            { "category": "work", "keywords": ["忠実", "小さいこと", "信頼"], "text": "ごく小さな事に忠実な人は、大きな事にも忠実であり、不忠実な人は大きな事にも不忠実です。", "ref": "ルカ 16:10" },
+            { "category": "work", "keywords": ["真理", "自由", "本質"], "text": "あなたがたは真理を知り、真理はあなたがたを自由にします。", "ref": "ヨハネ 8:32" },
+            { "category": "work", "keywords": ["熱心", "仕える", "パッション"], "text": "熱心で、うむことなく、霊に燃え、主に仕えなさい。", "ref": "ローマ 12:11" },
+            { "category": "work", "keywords": ["管理者", "責任", "誠実"], "text": "管理者に要求されることは、忠実だ、と認められることです。", "ref": "1コリント 4:2" },
+            { "category": "work", "keywords": ["目的", "栄光", "理由"], "text": "食べるにも、飲むにも、何をするにも、ただ神の栄光のためにしなさい。", "ref": "1コリント 10:31" },
+            { "category": "work", "keywords": ["役割", "チーム", "必要"], "text": "目に向かって「必要ない」と言うことはできないし、頭も足に向かって「必要ない」と言うことはできません。", "ref": "1コリント 12:21" },
+            { "category": "work", "keywords": ["秩序", "適切", "整理"], "text": "すべてのことを、適切に、秩序正しく行いなさい。", "ref": "1コリント 14:40" },
+            { "category": "work", "keywords": ["堅実", "動じない", "無駄じゃない"], "text": "堅く立って、動かされることなく、いつも主のわざに励みなさい。あなたがたの労苦はむだではないからです。", "ref": "1コリント 15:58" },
+            { "category": "work", "keywords": ["機会", "時間", "活用"], "text": "機会を十分に生かして用いなさい。悪い時代だからです。", "ref": "エペソ 5:16" },
+            { "category": "work", "keywords": ["本心", "心から", "奉仕"], "text": "うわべだけの奉仕ではなく、キリストのしもべとして、心から神のみこころを行いなさい。", "ref": "エペソ 6:6" },
+            { "category": "work", "keywords": ["すべて", "主", "仕事"], "text": "何をするにも、人に対してではなく、主に仕えるように、心からしなさい。", "ref": "コロサイ 3:23" },
+            { "category": "work", "keywords": ["会話", "知恵", "対応"], "text": "あなたがたの会話は、いつも慈しみに満ちた、塩で味つけされたものでありなさい。", "ref": "コロサイ 4:6" },
+            { "category": "work", "keywords": ["落ち着き", "仕事", "自立"], "text": "落ち着いた生活をし、自分の仕事に励み、自分の手で働きなさい。", "ref": "1テサロニケ 4:11" },
+            { "category": "work", "keywords": ["働く", "規律", "怠惰"], "text": "働きたくない者は、食べることもしてはならない。", "ref": "2テサロニケ 3:10" },
+            { "category": "work", "keywords": ["報酬", "給料", "権利"], "text": "聖書に「働き人が報酬を受けるのは当然である」と言われているからです。", "ref": "1テモテ 5:18" },
+            { "category": "work", "keywords": ["熟練", "恥じない", "真理"], "text": "あなたは、熟練した者、恥じるところのない働き人として、自分を神にささげるように励みなさい。", "ref": "2テモテ 2:15" },
+            { "category": "work", "keywords": ["準備", "良い業", "スタンバイ"], "text": "支配者と権威とに服従し、すべての良いわざをなす準備ができていなさい。", "ref": "テトス 3:1" },
+            { "category": "work", "keywords": ["実行", "行動", "実行"], "text": "みことばを行う人になりなさい。自分を欺いて、ただ聞くだけの者となってはいけません。", "ref": "ヤコブ 1:22" },
+            { "category": "relation", "keywords": ["平和", "子供", "仲介"], "text": "平和をつくる者は幸いです。その人たちは神の子供と呼ばれるからです。", "ref": "マタイ 5:9" },
+            { "category": "relation", "keywords": ["敵", "祈り", "愛"], "text": "自分の敵を愛し、自分を迫害する者のために祈りなさい。", "ref": "マタイ 5:44" },
+            { "category": "relation", "keywords": ["黄金律", "ルール", "相手"], "text": "何事でも、自分にしてもらいたいことは、ほかの人にもそのようにしなさい。", "ref": "マタイ 7:12" },
+            { "category": "relation", "keywords": ["赦し", "何度でも", "リセット"], "text": "「七回を七十倍するまで赦しなさい。」", "ref": "マタイ 18:22" },
+            { "category": "relation", "keywords": ["仕える", "リーダー", "謙虚"], "text": "あなたがたの間で偉くなりたいと思う者は、みなに仕える者になりなさい。", "ref": "マルコ 10:43" },
+            { "category": "relation", "keywords": ["裁かない", "批判", "ブーメラン"], "text": "人をさばくな。そうすれば自分もさばかれません。人を罪に定めるな。そうすれば自分も罪に定められません。", "ref": "ルカ 6:37" },
+            { "category": "relation", "keywords": ["愛", "掟", "互いに"], "text": "わたしがあなたがたを愛したように、あなたがたも互いに愛し合いなさい。", "ref": "ヨハネ 13:34" },
+            { "category": "relation", "keywords": ["友", "犠牲", "最高"], "text": "人がその友のためにいのちを捨てるという、これよりも大きな愛はだれも持っていません。", "ref": "ヨハネ 15:13" },
+            { "category": "relation", "keywords": ["尊敬", "優先", "マナー"], "text": "兄弟愛をもって互いに深く慈しみ、相手を自分より優れた者として敬いなさい。", "ref": "ローマ 12:10" },
+            { "category": "relation", "keywords": ["共感", "泣く", "笑う"], "text": "喜ぶ者とともに喜び、泣く者とともに泣きなさい。", "ref": "ローマ 12:15" },
+            { "category": "relation", "keywords": ["平和", "努力", "全方位"], "text": "できるならば、自分側から、すべての人と平和を保ちなさい。", "ref": "ローマ 12:18" },
+            { "category": "relation", "keywords": ["一致", "心", "チームワーク"], "text": "みな同じことを語り、あなたがたの間に分裂のないようにしなさい。", "ref": "1コリント 1:10" },
+            { "category": "relation", "keywords": ["愛", "忍耐", "親切"], "text": "愛は寛容であり、愛は親切です。また人をねたみません。愛は自慢せず、高ぶりません。", "ref": "1コリント 13:4" },
+            { "category": "relation", "keywords": ["重荷", "助け合い", "シェア"], "text": "互いの重荷を負い合いなさい。それによって、キリストの律法を全うするのです。", "ref": "ガラテヤ 6:2" },
+            { "category": "relation", "keywords": ["寛容", "我慢", "愛"], "text": "愛のゆえに互いに忍び合いなさい。", "ref": "エペソ 4:2" },
+            { "category": "relation", "keywords": ["言葉", "徳", "恵み"], "text": "悪いことばをいっさい口から出してはいけません。徳を高めるのに役に立つことばを語りなさい。", "ref": "エペソ 4:29" },
+            { "category": "relation", "keywords": ["親切", "赦し", "優しさ"], "text": "互いに親切にし、赦し合いなさい。神がキリストにおいてあなたがたを赦してくださったように。", "ref": "エペソ 4:32" },
+            { "category": "relation", "keywords": ["謙遜", "他者評価", "自己中心"], "text": "何事も利己的な思いからするのではなく、謙遜になって、互いに人を自分よりもすぐれた者と思いなさい。", "ref": "ピリピ 2:3" },
+            { "category": "relation", "keywords": ["励まし", "向上", "ポジティブ"], "text": "互いに励まし合い、高め合いなさい。", "ref": "1テサロニケ 5:11" },
+            { "category": "relation", "keywords": ["聞く", "話す", "怒り"], "text": "だれでも、聞くのに早く、語るのに遅く、怒るのに遅くありなさい。", "ref": "ヤコブ 1:19" },
+            { "category": "self", "keywords": ["価値", "雀", "数えられている"], "text": "あなたがたの頭の毛までも、みな数えられています。だから恐れることはありません。", "ref": "マタイ 10:30-31" },
+            { "category": "self", "keywords": ["子供", "特権", "受け入れる"], "text": "しかし、この方を受け入れた人々には、神の子供となる特権をお与えになった。", "ref": "ヨハネ 1:12" },
+            { "category": "self", "keywords": ["選ばれた", "任命", "実"], "text": "あなたがたがわたしを選んだのではなく、わたしがあなたがたを選び、任命したのです。", "ref": "ヨハネ 15:16" },
+            { "category": "self", "keywords": ["新しい", "命", "洗礼"], "text": "私たちはキリストとともに葬られたのです。…新しいいのちに歩むためです。", "ref": "ローマ 6:4" },
+            { "category": "self", "keywords": ["神の子", "導き", "霊"], "text": "神の御霊に導かれる人は、だれでも神の子供です。", "ref": "ローマ 8:14" },
+            { "category": "self", "keywords": ["勝利", "圧倒的", "愛"], "text": "私たちは、私たちを愛してくださった方によって、圧倒的な勝利者となるのです。", "ref": "ローマ 8:37" },
+            { "category": "self", "keywords": ["宮", "聖霊", "尊い"], "text": "あなたがたは神の宮であり、神の御霊があなたがたの内に宿っておられることを、知らないのですか。", "ref": "1コリント 3:16" },
+            { "category": "self", "keywords": ["賜物", "個性", "恵み"], "text": "私は、神の恵みによって、今の私になりました。", "ref": "1コリント 15:10" },
+            { "category": "self", "keywords": ["変えられる", "栄光", "鏡"], "text": "私たちはみな、鏡のように主の栄光を反映させながら、主と同じ姿に変えられていきます。", "ref": "2コリント 3:18" },
+            { "category": "self", "keywords": ["土の器", "宝", "力"], "text": "私たちは、この宝を土の器の中に入れています。この力が神のものであることが明らかになるためです。", "ref": "2コリント 4:7" },
+            { "category": "self", "keywords": ["内なる人", "日々", "更新"], "text": "たとい私たちの外なる人は衰えても、内なる人は日々新しくされています。", "ref": "2コリント 4:16" },
+            { "category": "self", "keywords": ["新しい創造", "リセット", "過去"], "text": "だれでもキリストにあるならば、その人は新しく造られた者です。すべてが新しくなりました。", "ref": "2コリント 5:17" },
+            { "category": "self", "keywords": ["自由", "解放", "くびき"], "text": "キリストは、自由を得させるために、私たちを解放してくださいました。", "ref": "ガラテヤ 5:1" },
+            { "category": "self", "keywords": ["選定", "聖なる", "傷がない"], "text": "神は世界の基が置かれる前から、キリストにあって私たちを選び、聖なる者にしようとされたのです。", "ref": "エペソ 1:4" },
+            { "category": "self", "keywords": ["作品", "傑作", "善い行い"], "text": "私たちは神の作品であって、良い行いをするためにキリスト・イエスにあって造られたのです。", "ref": "エペソ 2:10" },
+            { "category": "self", "keywords": ["国籍", "天", "市民"], "text": "私たちの国籍は天にあります。", "ref": "ピリピ 3:20" },
+            { "category": "self", "keywords": ["力", "できる", "強さ"], "text": "私は、私を強くしてくださる方によって、どんなことでもできるのです。", "ref": "ピリピ 4:13" },
+            { "category": "self", "keywords": ["愛される", "選ばれた", "聖なる"], "text": "あなたがたは神に選ばれた者、聖なる、愛されている者です。", "ref": "コロサイ 3:12" },
+            { "category": "self", "keywords": ["王", "祭司", "所有"], "text": "あなたがたは選ばれた種族、王である祭司、聖なる国民、神の所有とされた民です。", "ref": "1ペテロ 2:9" },
+            { "category": "self", "keywords": ["愛", "神の子", "呼ばれる"], "text": "私たちが神の子供と呼ばれるために、御父がどんなにすばらしい愛を与えてくださったかを考えなさい。", "ref": "1ヨハネ 3:1" },
+            { "category": "future", "keywords": ["探す", "門", "開く"], "text": "求めなさい、そうすれば与えられます。探しなさい、そうすれば見つかります。", "ref": "マタイ 7:7" },
+            { "category": "future", "keywords": ["狭い門", "道", "命"], "text": "狭い門から入りなさい。いのちに至る門は小さく、それを見いだす者はまれです。", "ref": "マタイ 7:13-14" },
+            { "category": "future", "keywords": ["道", "真理", "命"], "text": "イエスは彼に言われた。「わたしが道であり、真理であり、いのちなのです。」", "ref": "ヨハネ 14:6" },
+            { "category": "future", "keywords": ["報い", "忍耐", "永遠"], "text": "忍耐して善を行い、栄光を求める者には、永遠のいのちを与え…。", "ref": "ローマ 2:7" },
+            { "category": "future", "keywords": ["希望", "失望", "愛"], "text": "この希望は失望に終わることがありません。", "ref": "ローマ 5:5" },
+            { "category": "future", "keywords": ["導き", "神の子", "霊"], "text": "神の御霊に導かれる人は、だれでも神の子供です。", "ref": "ローマ 8:14" },
+            { "category": "future", "keywords": ["知恵", "深さ", "知識"], "text": "ああ、神の知恵と知識の富は、なんと深いことでしょう。", "ref": "ローマ 11:33" },
+            { "category": "future", "keywords": ["変えられる", "心", "神の御心"], "text": "心を新たにすることで自分を変えなさい。そうすれば、神の御心が何であるかがわかります。", "ref": "ローマ 12:2" },
+            { "category": "future", "keywords": ["希望", "喜び", "力"], "text": "望みの神が、あなたがたを喜びと平安で満たし、望みにあふれさせてくださいますように。", "ref": "ローマ 15:13" },
+            { "category": "future", "keywords": ["目", "耳", "心"], "text": "目がまだ見ず、耳がまだ聞かず、人の心に思い浮かびもしなかったことを、神は備えられた。", "ref": "1コリント 2:9" },
+            { "category": "future", "keywords": ["歩み", "信仰", "見えるもの"], "text": "私たちは、見えるものによらず、信仰によって歩むからです。", "ref": "2コリント 5:7" },
+            { "category": "future", "keywords": ["完成", "確信", "始まり"], "text": "あなたがたの内に良いわざを始められた方は、それを完成させてくださると確信しています。", "ref": "ピリピ 1:6" },
+            { "category": "future", "keywords": ["目標", "賞", "走る"], "text": "私は、目標を目ざして一心に走っているのです。", "ref": "ピリピ 3:14" },
+            { "category": "future", "keywords": ["望み", "天", "福音"], "text": "あなたがたのために天に蓄えられている望みのゆえです。", "ref": "コロサイ 1:5" },
+            { "category": "future", "keywords": ["約束", "誠実", "真実"], "text": "約束された方は真実な方ですから、動揺しないようにしましょう。", "ref": "ヘブル 10:23" },
+            { "category": "future", "keywords": ["信仰", "保証", "確信"], "text": "信仰は望んでいる事がらを保証し、目に見えないものを確信させるものです。", "ref": "ヘブル 11:1" },
+            { "category": "future", "keywords": ["都", "永遠", "探し求める"], "text": "私たちは、この地上に永遠の都を持たず、きたるべき都を探し求めているのです。", "ref": "ヘブル 13:14" },
+            { "category": "future", "keywords": ["知恵", "願い", "与える"], "text": "あなたがたの中に知恵の欠けた人がいるなら、だれにでも与えてくださる神に願いなさい。", "ref": "ヤコブ 1:5" },
+            { "category": "future", "keywords": ["計画", "主の御心", "生きる"], "text": "あなたがたは、「主のみこころであれば、私たちは生き、このことをしよう」と言うべきです。", "ref": "ヤコブ 4:15" },
+            { "category": "future", "keywords": ["永遠", "御心", "過ぎ去る"], "text": "世と世の欲は過ぎ去ります。しかし、神のみこころを行う者は永遠に生き続けます。", "ref": "1ヨハネ 2:17" },
+            { "category": "life", "keywords": ["空の鳥", "養う", "価値"], "text": "空の鳥を見なさい。種蒔きもせず刈り入れもしません。しかし、天の父は養ってくださいます。", "ref": "マタイ 6:26" },
+            { "category": "life", "keywords": ["必要", "第一に", "求める"], "text": "神の国とその義とをまず第一に求めなさい。そうすれば、これらのものはすべて与えられます。", "ref": "マタイ 6:33" },
+            { "category": "life", "keywords": ["宝", "天", "心"], "text": "自分の宝を地上にたくわえてはいけません。自分の宝を天にたくわえなさい。", "ref": "マタイ 6:19-20" },
+            { "category": "life", "keywords": ["二人の主人", "富", "神"], "text": "あなたがたは、神と富との両方に仕えることはできません。", "ref": "マタイ 6:24" },
+            { "category": "life", "keywords": ["家", "岩", "嵐"], "text": "雨が降り川があふれても倒れませんでした。岩の上に土台が据えられていたからです。", "ref": "マタイ 7:25" },
+            { "category": "life", "keywords": ["貪欲", "命", "持ち物"], "text": "人のいのちは、持ち物がいかに豊かであるかということにあるのではないからです。", "ref": "ルカ 12:15" },
+            { "category": "life", "keywords": ["苦難", "忍耐", "練達"], "text": "患難が忍耐を生み出し、忍耐が練られた品性を生み出し、希望を生み出す。", "ref": "ローマ 5:3-4" },
+            { "category": "life", "keywords": ["苦しみ", "栄光", "比較"], "text": "現在の苦しみは、将来現される栄光に比べれば、取るに足りないものだと私は考えます。", "ref": "ローマ 8:18" },
+            { "category": "life", "keywords": ["試練", "脱出", "耐える"], "text": "神は真実な方ですから、あなたがたを耐えられないほどの試練に会わせることはなさいません。", "ref": "1コリント 10:13" },
+            { "category": "life", "keywords": ["一時的", "永遠", "重み"], "text": "今の時の軽い患難は、測り知れない、重い永遠の栄光をもたらすからです。", "ref": "2コリント 4:17" },
+            { "category": "life", "keywords": ["種まき", "刈り取り", "法則"], "text": "人は自分の蒔いたものを、また刈り取ることになるのです。", "ref": "ガラテヤ 6:7" },
+            { "category": "life", "keywords": ["欠乏", "豊かさ", "秘訣"], "text": "私は、貧しさの中にいる道も知っており、豊かさの中にいる道も知っています。", "ref": "ピリピ 4:12" },
+            { "category": "life", "keywords": ["必要", "満たす", "供給"], "text": "私の神は、キリスト・イエスにあるご自身の栄光の富をもって、必要をすべて満たしてくださいます。", "ref": "ピリピ 4:19" },
+            { "category": "life", "keywords": ["満足", "敬虔", "利益"], "text": "満ち足りる心を伴う敬虔こそ、大きな利益を受ける道です。", "ref": "1テモテ 6:6" },
+            { "category": "life", "keywords": ["持ち込み", "持ち出し", "裸"], "text": "私たちは何一つこの世に持って来なかったし、何一つ持って出ることもできません。", "ref": "1テモテ 6:7" },
+            { "category": "life", "keywords": ["金銭欲", "悪", "迷い"], "text": "金銭を愛することが、あらゆる悪の根です。", "ref": "1テモテ 6:10" },
+            { "category": "life", "keywords": ["富", "高慢", "望み"], "text": "この世で富んでいる人たちに命じなさい。定かでない富に希望を置かないように。", "ref": "1テモテ 6:17" },
+            { "category": "life", "keywords": ["完走", "戦い", "信仰"], "text": "私は勇敢に戦い、走るべき道のりを走り終え、信仰を守り通しました。", "ref": "2テモテ 4:7" },
+            { "category": "life", "keywords": ["不変", "昨日", "今日"], "text": "イエス・キリストは、昨日も今日も、いつまでも変わることがありません。", "ref": "ヘブル 13:8" },
+            { "category": "life", "keywords": ["試練", "喜び", "成長"], "text": "私の兄弟たち。さまざまな試練に会うときは、それをこの上ない喜びと思いなさい。", "ref": "ヤコブ 1:2" }
         ];
 
         let currentVerseText = "";
         let currentVerseRef = "";
 
-        // 検索ロジック
         function searchVerse() {
             const input = document.getElementById('userInput').value.trim();
             let result;
-
             if (input) {
-                // 部分一致検索
                 const matched = bibleVerses.filter(v => 
-                    v.keywords.some(k => k.includes(input)) || 
-                    v.text.includes(input)
+                    v.keywords.some(k => k.includes(input)) || v.text.includes(input)
                 );
-                
-                if (matched.length > 0) {
-                    result = matched[Math.floor(Math.random() * matched.length)];
-                } else {
-                    result = { 
-                        text: "あなたのその悩みを知っている方がいます。今はただ、心を休めてください。", 
-                        ref: "御言葉サプリからのメッセージ" 
-                    };
-                }
+                result = matched.length > 0 ? matched[Math.floor(Math.random() * matched.length)] 
+                       : { text: "あなたのその悩みを知っている方がいます。今はただ、心を休めてください。", ref: "御言葉サプリ" };
             } else {
-                // ランダム
                 result = bibleVerses[Math.floor(Math.random() * bibleVerses.length)];
             }
-
             displayModal(result);
         }
 
-        // カテゴリ検索
         function filterByCategory(category) {
             const filtered = bibleVerses.filter(v => v.category === category);
             if (filtered.length > 0) {
-                const result = filtered[Math.floor(Math.random() * filtered.length)];
-                displayModal(result);
+                displayModal(filtered[Math.floor(Math.random() * filtered.length)]);
             }
         }
 
-        // Enterキー対応
         function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                searchVerse();
-            }
+            if (event.key === 'Enter') searchVerse();
         }
 
-        // モーダル表示
         function displayModal(verse) {
             const textEl = document.getElementById('modalText');
             const refEl = document.getElementById('modalRef');
@@ -520,7 +442,6 @@
             textEl.innerText = verse.text;
             refEl.innerText = verse.ref;
 
-            // アニメーションリセット
             [iconEl, textEl, refEl, shareEl].forEach(el => {
                 el.classList.remove('animate-in');
                 el.style.opacity = 0;
@@ -528,40 +449,31 @@
 
             overlay.classList.add('active');
 
-            // 時間差表示
             setTimeout(() => iconEl.classList.add('animate-in'), 150);
             setTimeout(() => textEl.classList.add('animate-in'), 350);
             setTimeout(() => refEl.classList.add('animate-in'), 650);
             setTimeout(() => shareEl.classList.add('animate-in'), 850);
         }
 
-        // 閉じる
         function closeModal(event) {
-            if (event.target.id === 'modalOverlay') {
-                closeModalButton();
-            }
+            if (event.target.id === 'modalOverlay') closeModalButton();
         }
 
         function closeModalButton() {
             document.getElementById('modalOverlay').classList.remove('active');
         }
 
-        // シェア機能（フォールバック付き）
         function shareAction(type) {
             const shareText = `${currentVerseText}\n（${currentVerseRef}）\n\n#御言葉サプリ #心の処方箋`;
             const encodedText = encodeURIComponent(shareText);
 
             if (type === 'copy') {
                 if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(shareText).then(() => {
-                        showToast("コピーしました📋");
-                    }).catch(err => {
-                        fallbackCopy(shareText);
-                    });
+                    navigator.clipboard.writeText(shareText).then(() => showToast("コピーしました📋"))
+                    .catch(() => fallbackCopy(shareText));
                 } else {
                     fallbackCopy(shareText);
                 }
-
             } else if (type === 'x') {
                 window.open(`https://twitter.com/intent/tweet?text=${encodedText}`, '_blank');
             } else if (type === 'line') {
@@ -583,14 +495,7 @@
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
-            
-            try {
-                const successful = document.execCommand('copy');
-                if(successful) showToast("コピーしました📋");
-            } catch (err) {
-                console.error('コピー失敗', err);
-            }
-            
+            try { document.execCommand('copy'); showToast("コピーしました📋"); } catch (err) {}
             document.body.removeChild(textArea);
         }
 
@@ -598,9 +503,7 @@
             showToast("コピーしました📸 Instagramを開きます");
             setTimeout(() => {
                 window.location.href = "instagram://app";
-                setTimeout(() => {
-                    window.open("https://www.instagram.com/", '_blank');
-                }, 500);
+                setTimeout(() => window.open("https://www.instagram.com/", '_blank'), 500);
             }, 1500);
         }
 
@@ -608,9 +511,7 @@
             const toast = document.getElementById('toast');
             toast.innerText = message;
             toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
     </script>
 </body>
