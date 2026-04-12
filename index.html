@@ -232,6 +232,38 @@
         .modal-card.gacha-rolling .verse-ref  { opacity: 0.45 !important; }
         .modal-card.gacha-hit { animation: gachaFlash 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
 
+        /* ── 確定フラッシュ（外側放射グロー） ── */
+        @keyframes auraExpand {
+            0%   { opacity: 1;   transform: scale(0.5); }
+            50%  { opacity: 0.6; transform: scale(1.2); }
+            100% { opacity: 0;   transform: scale(2.0); }
+        }
+        @keyframes auraExpand2 {
+            0%   { opacity: 0.7; transform: scale(0.4); }
+            40%  { opacity: 0.4; transform: scale(1.0); }
+            100% { opacity: 0;   transform: scale(1.6); }
+        }
+        .glow-aura {
+            position: absolute;
+            width: 400px; height: 400px;
+            margin-left: -200px; margin-top: -200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,250,200,0.95) 0%, rgba(255,220,80,0.55) 40%, rgba(255,180,30,0.15) 70%, transparent 85%);
+            pointer-events: none; z-index: 0;
+            will-change: transform, opacity;
+            animation: auraExpand 0.65s ease-out forwards;
+        }
+        .glow-aura2 {
+            position: absolute;
+            width: 560px; height: 560px;
+            margin-left: -280px; margin-top: -280px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,240,150,0.5) 0%, rgba(255,200,60,0.2) 45%, transparent 70%);
+            pointer-events: none; z-index: 0;
+            will-change: transform, opacity;
+            animation: auraExpand2 0.9s ease-out forwards;
+        }
+
         .gacha-badge {
             position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
             background: linear-gradient(135deg, #d4a373, #e9c46a);
@@ -810,6 +842,21 @@
             refEl.innerText   = verse.ref;
             badge.textContent = '✨ みことばが届きました';
             setTimeout(() => card.classList.remove('gacha-hit'), 600);
+
+            // 外側放射グロー
+            const overlay2 = document.getElementById('modalOverlay');
+            const cRect    = card.getBoundingClientRect();
+            const oRect    = overlay2.getBoundingClientRect();
+            const cx = cRect.left - oRect.left + cRect.width  / 2;
+            const cy = cRect.top  - oRect.top  + cRect.height / 2;
+            [['glow-aura', 700], ['glow-aura2', 950]].forEach(([cls, dur]) => {
+                const el = document.createElement('div');
+                el.className = cls;
+                el.style.left = cx + 'px';
+                el.style.top  = cy + 'px';
+                overlay2.appendChild(el);
+                setTimeout(() => el.remove(), dur);
+            });
 
             // 残り要素をふわっと表示
             setTimeout(() => iconEl.classList.add('animate-in'), 200);
