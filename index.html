@@ -211,26 +211,29 @@
         }
         .animate-in { animation: floatUp 0.8s forwards; }
 
-        /* ── ガチャ演出 ── */
-        @keyframes gachaShake {
-            0%, 100% { transform: translateX(0) scale(1); }
-            25% { transform: translateX(-3px) scale(0.99); }
-            75% { transform: translateX(3px) scale(0.99); }
+        /* ── ページめくり演出 ── */
+        @keyframes pageSlideIn {
+            from { opacity: 0; transform: translateX(-45px); }
+            to   { opacity: 1; transform: translateX(0); }
         }
-        @keyframes gachaFlash {
+        @keyframes pageShadowSweep {
+            0%   { opacity: 1;   transform: translateX(-100%); }
+            100% { opacity: 0;   transform: translateX(30%); }
+        }
+        @keyframes pageConfirm {
             0%   { transform: scale(1); box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
-            30%  { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(212,163,115,0.45), 0 15px 40px rgba(0,0,0,0.1); }
-            65%  { transform: scale(0.97); }
+            30%  { transform: scale(1.03); box-shadow: 0 0 0 5px rgba(212,163,115,0.4), 0 15px 40px rgba(0,0,0,0.1); }
+            65%  { transform: scale(0.98); }
             100% { transform: scale(1); box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
         }
-        @keyframes textFlicker {
-            0%, 100% { opacity: 1; filter: blur(0); }
-            50%      { opacity: 0.55; filter: blur(1.5px); }
+        .page-shadow {
+            position: absolute; inset: 0; border-radius: 15px;
+            background: linear-gradient(90deg, transparent 0%, rgba(93,85,72,0.1) 35%, rgba(93,85,72,0.06) 60%, transparent 100%);
+            pointer-events: none; z-index: 5;
+            animation: pageShadowSweep 0.18s ease-out forwards;
         }
-        .modal-card.gacha-rolling { animation: gachaShake 0.14s linear infinite; }
-        .modal-card.gacha-rolling .verse-text { animation: textFlicker 0.14s linear infinite; font-size: 0.9rem !important; color: #9c9488; }
-        .modal-card.gacha-rolling .verse-ref  { opacity: 0.45 !important; }
-        .modal-card.gacha-hit { animation: gachaFlash 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .modal-card.page-flipping .verse-text { font-size: 0.95rem; color: #8d8579; }
+        .modal-card.gacha-hit { animation: pageConfirm 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
 
         /* ── 確定フラッシュ（外側放射グロー） ── */
         @keyframes auraExpand {
@@ -817,26 +820,40 @@
 
             // モーダルを開く
             overlay.classList.add('active');
-            badge.textContent = '🎲 引いています...';
+            badge.textContent = '📖 ページをめくっています...';
 
-            // ── ガチャ演出（スロット式） ──
-            card.classList.add('gacha-rolling');
+            // ── ページめくり演出 ──
+            card.classList.add('page-flipping');
             await new Promise(resolve => {
-                const rollCount = 18;
+                const flipCount = 14;
                 let i = 0;
-                function roll() {
-                    if (i >= rollCount) { resolve(); return; }
+                function flipPage() {
+                    if (i >= flipCount) { resolve(); return; }
                     const r = bibleVerses[Math.floor(Math.random() * bibleVerses.length)];
                     textEl.innerText = r.text;
                     refEl.innerText  = r.ref;
-                    setTimeout(roll, 50 + Math.pow(i / rollCount, 2.4) * 340);
+
+                    // テキストを右からスライドイン
+                    textEl.style.animation = 'none';
+                    void textEl.offsetHeight;
+                    textEl.style.animation = 'pageSlideIn 0.18s ease-out forwards';
+
+                    // ページ影をスイープ
+                    const shadow = document.createElement('div');
+                    shadow.className = 'page-shadow';
+                    card.appendChild(shadow);
+                    setTimeout(() => shadow.remove(), 200);
+
+                    const delay = 70 + Math.pow(i / flipCount, 2.2) * 380;
                     i++;
+                    setTimeout(flipPage, delay);
                 }
-                roll();
+                flipPage();
             });
 
             // 確定！
-            card.classList.remove('gacha-rolling');
+            card.classList.remove('page-flipping');
+            textEl.style.animation = 'none';
             card.classList.add('gacha-hit');
             textEl.innerText  = verse.text;
             refEl.innerText   = verse.ref;
