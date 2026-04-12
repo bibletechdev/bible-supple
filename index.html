@@ -211,6 +211,54 @@
         }
         .animate-in { animation: floatUp 0.8s forwards; }
 
+        /* ── ガチャ演出 ── */
+        @keyframes gachaShake {
+            0%, 100% { transform: translateX(0) scale(1); }
+            25% { transform: translateX(-3px) scale(0.99); }
+            75% { transform: translateX(3px) scale(0.99); }
+        }
+        @keyframes gachaFlash {
+            0%   { transform: scale(1); box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+            30%  { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(212,163,115,0.45), 0 15px 40px rgba(0,0,0,0.1); }
+            65%  { transform: scale(0.97); }
+            100% { transform: scale(1); box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+        }
+        @keyframes textFlicker {
+            0%, 100% { opacity: 1; filter: blur(0); }
+            50%      { opacity: 0.55; filter: blur(1.5px); }
+        }
+        .modal-card.gacha-rolling { animation: gachaShake 0.14s linear infinite; }
+        .modal-card.gacha-rolling .verse-text { animation: textFlicker 0.14s linear infinite; font-size: 0.9rem !important; color: #9c9488; }
+        .modal-card.gacha-rolling .verse-ref  { opacity: 0.45 !important; }
+        .modal-card.gacha-hit { animation: gachaFlash 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+
+        .gacha-badge {
+            position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+            background: linear-gradient(135deg, #d4a373, #e9c46a);
+            color: white; font-size: 0.7rem; font-weight: bold;
+            padding: 4px 16px; border-radius: 20px; white-space: nowrap;
+            box-shadow: 0 3px 8px rgba(212,163,115,0.4);
+            letter-spacing: 0.05em; opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-overlay.active .gacha-badge { opacity: 1; }
+
+        /* ── 音読ボタン ── */
+        .speak-row {
+            display: flex; align-items: center; justify-content: center;
+            gap: 10px; margin-bottom: 4px; opacity: 0;
+        }
+        .speak-btn {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: #f0ece6; border: 2px solid #e0dcd5;
+            cursor: pointer; display: flex; justify-content: center; align-items: center;
+            transition: 0.25s; flex-shrink: 0;
+        }
+        .speak-btn svg { width: 20px; height: 20px; fill: #8d8579; transition: fill 0.2s; }
+        .speak-btn.speaking { background: #eef5f0; border-color: var(--primary-color); }
+        .speak-btn.speaking svg { fill: var(--primary-color); }
+        .speak-btn:active { transform: scale(0.92); }
+        .speak-label { font-size: 0.8rem; color: #9c9488; }
+
         .footer { font-size: 0.65rem; color: #b0a99f; margin-top: 5px; }
     </style>
 </head>
@@ -248,9 +296,16 @@
 
     <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
         <div class="modal-card">
+            <div class="gacha-badge" id="gachaBadge"></div>
             <span class="verse-icon">🌿</span>
             <div class="verse-text" id="modalText"></div>
             <span class="verse-ref" id="modalRef"></span>
+            <div class="speak-row" id="speakRow">
+                <button class="speak-btn" id="speakBtn" onclick="speakVerse()" title="音読する">
+                    <svg viewBox="0 0 24 24"><path d="M3,9V15H7L12,20V4L7,9H3M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23Z"/></svg>
+                </button>
+                <span class="speak-label">音読する</span>
+            </div>
             <div class="share-container" id="shareButtons">
                 <button class="share-btn copy" onclick="shareAction('copy')" title="コピー">
                     <svg viewBox="0 0 24 24"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg>
@@ -702,30 +757,64 @@
             }
         }
 
-        function displayModal(verse) {
-            const textEl = document.getElementById('modalText');
-            const refEl = document.getElementById('modalRef');
-            const iconEl = document.querySelector('.verse-icon');
-            const shareEl = document.getElementById('shareButtons');
-            const overlay = document.getElementById('modalOverlay');
+        async function displayModal(verse) {
+            const textEl    = document.getElementById('modalText');
+            const refEl     = document.getElementById('modalRef');
+            const iconEl    = document.querySelector('.verse-icon');
+            const shareEl   = document.getElementById('shareButtons');
+            const speakRowEl = document.getElementById('speakRow');
+            const overlay   = document.getElementById('modalOverlay');
+            const card      = document.querySelector('.modal-card');
+            const badge     = document.getElementById('gachaBadge');
 
             currentVerseText = verse.text;
-            currentVerseRef = verse.ref;
+            currentVerseRef  = verse.ref;
 
-            textEl.innerText = verse.text;
-            refEl.innerText = verse.ref;
-
-            [iconEl, textEl, refEl, shareEl].forEach(el => {
+            // リセット
+            [iconEl, shareEl, speakRowEl].forEach(el => {
                 el.classList.remove('animate-in');
-                el.style.opacity = 0;
+                el.style.opacity = '0';
+            });
+            textEl.style.opacity = '1';
+            refEl.style.opacity  = '1';
+            textEl.classList.remove('animate-in');
+            refEl.classList.remove('animate-in');
+            card.classList.remove('gacha-hit');
+            if (window.speechSynthesis) speechSynthesis.cancel();
+            updateSpeakBtn(false);
+
+            // モーダルを開く
+            overlay.classList.add('active');
+            badge.textContent = '🎲 引いています...';
+
+            // ── ガチャ演出（スロット式） ──
+            card.classList.add('gacha-rolling');
+            await new Promise(resolve => {
+                const rollCount = 18;
+                let i = 0;
+                function roll() {
+                    if (i >= rollCount) { resolve(); return; }
+                    const r = bibleVerses[Math.floor(Math.random() * bibleVerses.length)];
+                    textEl.innerText = r.text;
+                    refEl.innerText  = r.ref;
+                    setTimeout(roll, 50 + Math.pow(i / rollCount, 2.4) * 340);
+                    i++;
+                }
+                roll();
             });
 
-            overlay.classList.add('active');
+            // 確定！
+            card.classList.remove('gacha-rolling');
+            card.classList.add('gacha-hit');
+            textEl.innerText  = verse.text;
+            refEl.innerText   = verse.ref;
+            badge.textContent = '✨ みことばが届きました';
+            setTimeout(() => card.classList.remove('gacha-hit'), 600);
 
-            setTimeout(() => iconEl.classList.add('animate-in'), 150);
-            setTimeout(() => textEl.classList.add('animate-in'), 350);
-            setTimeout(() => refEl.classList.add('animate-in'), 650);
-            setTimeout(() => shareEl.classList.add('animate-in'), 850);
+            // 残り要素をふわっと表示
+            setTimeout(() => iconEl.classList.add('animate-in'), 200);
+            setTimeout(() => speakRowEl.classList.add('animate-in'), 420);
+            setTimeout(() => shareEl.classList.add('animate-in'), 640);
         }
 
         function closeModal(event) {
@@ -734,6 +823,37 @@
 
         function closeModalButton() {
             document.getElementById('modalOverlay').classList.remove('active');
+            if (window.speechSynthesis) speechSynthesis.cancel();
+            updateSpeakBtn(false);
+        }
+
+        // ── 音読 ──
+        function speakVerse() {
+            if (!window.speechSynthesis) {
+                showToast('このブラウザは音読に未対応です');
+                return;
+            }
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+                updateSpeakBtn(false);
+                return;
+            }
+            const utterance = new SpeechSynthesisUtterance(currentVerseText + '。' + currentVerseRef);
+            utterance.lang  = 'ja-JP';
+            utterance.rate  = 0.82;
+            utterance.pitch = 1.0;
+            utterance.onstart = () => updateSpeakBtn(true);
+            utterance.onend   = () => updateSpeakBtn(false);
+            utterance.onerror = () => updateSpeakBtn(false);
+            speechSynthesis.speak(utterance);
+        }
+
+        function updateSpeakBtn(isSpeaking) {
+            const btn   = document.getElementById('speakBtn');
+            const label = document.querySelector('.speak-label');
+            if (!btn) return;
+            btn.classList.toggle('speaking', isSpeaking);
+            if (label) label.textContent = isSpeaking ? '停止する' : '音読する';
         }
 
         function shareAction(type) {
