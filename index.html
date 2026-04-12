@@ -171,20 +171,20 @@
         .modal-card {
             background: #fffcf7;
             width: 88%; max-width: 380px;
-            padding: 40px 20px; 
+            padding: 40px 20px;
             border-radius: 15px;
             text-align: center;
-            opacity: 0; transform: scale(0.9);
-            transition: 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            opacity: 0;
             box-shadow: 0 15px 40px rgba(0,0,0,0.1);
             position: relative;
             border: 1px solid #eae6df;
+            z-index: 1;
         }
         .modal-card::before {
             content: ""; position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px;
             border: 1px dashed #dcd6cb; border-radius: 10px; pointer-events: none;
         }
-        .modal-overlay.active .modal-card { opacity: 1; transform: scale(1); }
+        /* カードの表示はJSアニメーションで制御 */
 
         .verse-icon { font-size: 2.8rem; margin-bottom: 15px; display: block; opacity: 0; color: var(--primary-color); }
         .verse-text {
@@ -211,26 +211,82 @@
         }
         .animate-in { animation: floatUp 0.8s forwards; }
 
-        /* ── ガチャ演出 ── */
-        @keyframes gachaShake {
-            0%, 100% { transform: translateX(0) scale(1); }
-            25% { transform: translateX(-3px) scale(0.99); }
-            75% { transform: translateX(3px) scale(0.99); }
+        /* ── 天から舞い降りる演出 ── */
+        @keyframes fallFromHeaven {
+            0%   { opacity: 0;    transform: translateY(-100vh) rotate(-8deg) scale(0.8);  filter: blur(8px) brightness(3); }
+            25%  { opacity: 0.15; transform: translateY(-55vh)  rotate(-5deg) scale(0.87); filter: blur(5px) brightness(2.2); }
+            50%  { opacity: 0.6;  transform: translateY(-10vh)  rotate(-1deg) scale(0.97); filter: blur(1px) brightness(1.5); }
+            65%  { opacity: 0.9;  transform: translateY(14px)   rotate(1.2deg) scale(1.04); filter: blur(0)  brightness(1.3); }
+            78%  { opacity: 1;    transform: translateY(-6px)   rotate(-0.4deg) scale(0.99); filter: brightness(1.1); }
+            88%  { transform: translateY(3px)  rotate(0.2deg) scale(1.01); }
+            100% { opacity: 1;    transform: translateY(0)      rotate(0deg)   scale(1);    filter: brightness(1); }
         }
-        @keyframes gachaFlash {
-            0%   { transform: scale(1); box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
-            30%  { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(212,163,115,0.45), 0 15px 40px rgba(0,0,0,0.1); }
-            65%  { transform: scale(0.97); }
-            100% { transform: scale(1); box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+        @keyframes landGlow {
+            0%   { box-shadow: 0 0 55px 22px rgba(255,235,130,0.95), 0 0 110px 50px rgba(255,210,60,0.45); }
+            45%  { box-shadow: 0 0 75px 35px rgba(255,235,130,0.55), 0 0 140px 70px rgba(255,210,60,0.2); }
+            100% { box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
         }
-        @keyframes textFlicker {
-            0%, 100% { opacity: 1; filter: blur(0); }
-            50%      { opacity: 0.55; filter: blur(1.5px); }
+        @keyframes rayPulse {
+            0%   { opacity: 0.85; transform: scale(0.25); }
+            55%  { opacity: 0.4; transform: scale(1.1); }
+            100% { opacity: 0; transform: scale(1.6); }
         }
-        .modal-card.gacha-rolling { animation: gachaShake 0.14s linear infinite; }
-        .modal-card.gacha-rolling .verse-text { animation: textFlicker 0.14s linear infinite; font-size: 0.9rem !important; color: #9c9488; }
-        .modal-card.gacha-rolling .verse-ref  { opacity: 0.45 !important; }
-        .modal-card.gacha-hit { animation: gachaFlash 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        @keyframes shineSweep {
+            from { left: -80%; }
+            to   { left: 130%; }
+        }
+        @keyframes particleFly {
+            0%   { transform: translate(0,0) scale(1); opacity: 1; }
+            80%  { opacity: 0.6; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0.1); opacity: 0; }
+        }
+
+        .heaven-rays {
+            position: absolute;
+            width: 520px; height: 520px;
+            left: 50%; top: 50%;
+            margin-left: -260px; margin-top: -260px;
+            background: conic-gradient(
+                rgba(255,240,140,0.28) 0deg,   transparent 10deg,
+                rgba(255,240,140,0.20) 20deg,  transparent 30deg,
+                rgba(255,240,140,0.25) 40deg,  transparent 50deg,
+                rgba(255,240,140,0.18) 60deg,  transparent 70deg,
+                rgba(255,240,140,0.28) 80deg,  transparent 90deg,
+                rgba(255,240,140,0.20) 100deg, transparent 110deg,
+                rgba(255,240,140,0.25) 120deg, transparent 130deg,
+                rgba(255,240,140,0.18) 140deg, transparent 150deg,
+                rgba(255,240,140,0.28) 160deg, transparent 170deg,
+                rgba(255,240,140,0.20) 180deg, transparent 190deg,
+                rgba(255,240,140,0.25) 200deg, transparent 210deg,
+                rgba(255,240,140,0.18) 220deg, transparent 230deg,
+                rgba(255,240,140,0.28) 240deg, transparent 250deg,
+                rgba(255,240,140,0.20) 260deg, transparent 270deg,
+                rgba(255,240,140,0.25) 280deg, transparent 290deg,
+                rgba(255,240,140,0.18) 300deg, transparent 310deg,
+                rgba(255,240,140,0.28) 320deg, transparent 330deg,
+                rgba(255,240,140,0.20) 340deg, transparent 350deg,
+                rgba(255,240,140,0.25) 360deg
+            );
+            border-radius: 50%;
+            pointer-events: none; z-index: 0;
+            opacity: 0; transform-origin: center;
+        }
+        .card-shine-wrap {
+            position: absolute; inset: 0; overflow: hidden;
+            border-radius: 15px; pointer-events: none; z-index: 15;
+        }
+        .card-shine {
+            position: absolute; top: 0; bottom: 0; left: -80%; width: 50%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.65), transparent);
+            transform: skewX(-15deg);
+            animation: shineSweep 0.65s ease-in-out forwards;
+            pointer-events: none;
+        }
+        .particle {
+            position: absolute; border-radius: 50%;
+            pointer-events: none; z-index: 1001;
+            animation: particleFly 0.8s ease-out forwards;
+        }
 
         .gacha-badge {
             position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
@@ -295,6 +351,7 @@
     </div>
 
     <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="heaven-rays" id="heavenRays"></div>
         <div class="modal-card">
             <div class="gacha-badge" id="gachaBadge"></div>
             <span class="verse-icon">🌿</span>
@@ -758,63 +815,62 @@
         }
 
         async function displayModal(verse) {
-            const textEl    = document.getElementById('modalText');
-            const refEl     = document.getElementById('modalRef');
-            const iconEl    = document.querySelector('.verse-icon');
-            const shareEl   = document.getElementById('shareButtons');
+            const textEl     = document.getElementById('modalText');
+            const refEl      = document.getElementById('modalRef');
+            const iconEl     = document.querySelector('.verse-icon');
+            const shareEl    = document.getElementById('shareButtons');
             const speakRowEl = document.getElementById('speakRow');
-            const overlay   = document.getElementById('modalOverlay');
-            const card      = document.querySelector('.modal-card');
-            const badge     = document.getElementById('gachaBadge');
+            const overlay    = document.getElementById('modalOverlay');
+            const card       = document.querySelector('.modal-card');
+            const badge      = document.getElementById('gachaBadge');
+            const rays       = document.getElementById('heavenRays');
 
             currentVerseText = verse.text;
             currentVerseRef  = verse.ref;
 
             // リセット
-            [iconEl, shareEl, speakRowEl].forEach(el => {
+            [iconEl, textEl, refEl, shareEl, speakRowEl].forEach(el => {
                 el.classList.remove('animate-in');
                 el.style.opacity = '0';
             });
-            textEl.style.opacity = '1';
-            refEl.style.opacity  = '1';
-            textEl.classList.remove('animate-in');
-            refEl.classList.remove('animate-in');
-            card.classList.remove('gacha-hit');
+            card.style.animation  = 'none';
+            card.style.opacity    = '';   // インラインをクリア → CSS の opacity:0 が効く
+            rays.style.animation  = 'none';
+            rays.style.opacity    = '0';
+            badge.textContent     = '';
+            void card.offsetHeight;
+
             if (window.speechSynthesis) speechSynthesis.cancel();
             updateSpeakBtn(false);
 
-            // モーダルを開く
+            textEl.innerText = verse.text;
+            refEl.innerText  = verse.ref;
+
             overlay.classList.add('active');
-            badge.textContent = '🎲 引いています...';
+            await new Promise(r => setTimeout(r, 30));
 
-            // ── ガチャ演出（スロット式） ──
-            card.classList.add('gacha-rolling');
-            await new Promise(resolve => {
-                const rollCount = 18;
-                let i = 0;
-                function roll() {
-                    if (i >= rollCount) { resolve(); return; }
-                    const r = bibleVerses[Math.floor(Math.random() * bibleVerses.length)];
-                    textEl.innerText = r.text;
-                    refEl.innerText  = r.ref;
-                    setTimeout(roll, 50 + Math.pow(i / rollCount, 2.4) * 340);
-                    i++;
-                }
-                roll();
-            });
+            // ── 天から舞い降りる ──
+            card.style.animation = 'fallFromHeaven 1.3s cubic-bezier(0.15, 0.8, 0.3, 1) forwards';
 
-            // 確定！
-            card.classList.remove('gacha-rolling');
-            card.classList.add('gacha-hit');
-            textEl.innerText  = verse.text;
-            refEl.innerText   = verse.ref;
-            badge.textContent = '✨ みことばが届きました';
-            setTimeout(() => card.classList.remove('gacha-hit'), 600);
+            await new Promise(r => setTimeout(r, 1000));
 
-            // 残り要素をふわっと表示
-            setTimeout(() => iconEl.classList.add('animate-in'), 200);
-            setTimeout(() => speakRowEl.classList.add('animate-in'), 420);
-            setTimeout(() => shareEl.classList.add('animate-in'), 640);
+            // 着地！ 光芒 + ゴールドグロー + パーティクル + シャイン
+            void rays.offsetHeight;
+            rays.style.opacity   = '1';
+            rays.style.animation = 'rayPulse 0.85s ease-out forwards';
+
+            card.style.opacity   = '1';   // landGlow 切替時に opacity を維持
+            card.style.animation = 'landGlow 1.2s ease-out forwards';
+            badge.textContent    = '✨ みことばが届きました';
+
+            burstParticles();
+            addShine(card);
+
+            setTimeout(() => iconEl.classList.add('animate-in'),    80);
+            setTimeout(() => textEl.classList.add('animate-in'),   260);
+            setTimeout(() => refEl.classList.add('animate-in'),    560);
+            setTimeout(() => speakRowEl.classList.add('animate-in'), 760);
+            setTimeout(() => shareEl.classList.add('animate-in'),  940);
         }
 
         function closeModal(event) {
@@ -822,12 +878,48 @@
         }
 
         function closeModalButton() {
-            document.getElementById('modalOverlay').classList.remove('active');
+            const overlay = document.getElementById('modalOverlay');
+            const card    = document.querySelector('.modal-card');
+            overlay.classList.remove('active');
+            card.style.animation = 'none';
+            card.style.opacity   = '0';
             if (window.speechSynthesis) speechSynthesis.cancel();
             updateSpeakBtn(false);
         }
 
-        // ── 音読 ──
+        function burstParticles() {
+            const overlay = document.getElementById('modalOverlay');
+            const card    = document.querySelector('.modal-card');
+            const oRect   = overlay.getBoundingClientRect();
+            const cRect   = card.getBoundingClientRect();
+            const cx = cRect.left - oRect.left + cRect.width  / 2;
+            const cy = cRect.top  - oRect.top  + cRect.height / 2;
+            const colors = ['#d4a373','#e9c46a','#8ba382','#f4a261','#a8d5a2','#fffde7','#ffffff'];
+            for (let i = 0; i < 26; i++) {
+                const p     = document.createElement('div');
+                p.className = 'particle';
+                const angle = (i / 26) * Math.PI * 2;
+                const dist  = 65 + Math.random() * 120;
+                const tx    = Math.cos(angle) * dist;
+                const ty    = Math.sin(angle) * dist;
+                const size  = 5 + Math.random() * 8;
+                p.style.cssText = `left:${cx}px;top:${cy}px;width:${size}px;height:${size}px;background:${colors[i % colors.length]};--tx:${tx}px;--ty:${ty}px;`;
+                overlay.appendChild(p);
+                setTimeout(() => p.remove(), 850);
+            }
+        }
+
+        function addShine(container) {
+            const wrap  = document.createElement('div');
+            wrap.className = 'card-shine-wrap';
+            const shine = document.createElement('div');
+            shine.className = 'card-shine';
+            wrap.appendChild(shine);
+            container.appendChild(wrap);
+            setTimeout(() => wrap.remove(), 750);
+        }
+
+        // ── 音読（聖句テキストのみ） ──
         function speakVerse() {
             if (!window.speechSynthesis) {
                 showToast('このブラウザは音読に未対応です');
@@ -838,7 +930,7 @@
                 updateSpeakBtn(false);
                 return;
             }
-            const utterance = new SpeechSynthesisUtterance(currentVerseText + '。' + currentVerseRef);
+            const utterance = new SpeechSynthesisUtterance(currentVerseText);
             utterance.lang  = 'ja-JP';
             utterance.rate  = 0.82;
             utterance.pitch = 1.0;
