@@ -232,7 +232,14 @@
             pointer-events: none; z-index: 5;
             animation: pageShadowSweep 0.18s ease-out forwards;
         }
-        .modal-card.page-flipping .verse-text { font-size: 0.95rem; color: #8d8579; }
+        .modal-card.page-flipping .verse-text {
+            font-size: 0.95rem; color: #8d8579;
+            height: 7.5em;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 5;
+            -webkit-box-orient: vertical;
+        }
         .modal-card.gacha-hit { animation: pageConfirm 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
 
         /* ── 確定フラッシュ（外側放射グロー） ── */
