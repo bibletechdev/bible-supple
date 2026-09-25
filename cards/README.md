@@ -60,11 +60,12 @@ QRを読むと、みことばの図版と朗読が流れるページ。アプリ
 ダブルクリックで開くと verses.js や音声の読み込みが拒否されるので、必ずこの方法で。
 スマホ実機の確認（特にAR・カメラ）は https が必要なので GitHub Pages に置く。
 
-## 公開手順（GitHub Pages）
-1. https://github.com/new で Owner `bibletechdev`、名前 `mikotoba-postcard`、Public、README なしで作成
-2. `git push -u origin main`（remote は設定済み）
-3. リポジトリの Settings → Pages → Branch: `main` / `(root)` → 数分で https://bibletechdev.github.io/mikotoba-postcard/ に公開
-4. QR は `print.html?back=1&base=https://bibletechdev.github.io/mikotoba-postcard/` の裏面に入る
+## 公開（GitHub Pages）
+- 公開URL：**https://bibletechdev.github.io/bible-supple/cards/**（1枚ページは `?v=<id>`）
+- リポジトリ `bibletechdev/bible-supple` の `cards/` フォルダに置いている（ルートは「みことばサプリ」）
+- 反映：`python tools/deploy.py "変更の説明"` → Git に記録済みのファイルを `D:\EDIT_work\みことばサプリ\cards` にコピーして push（先にこのフォルダでコミットしておく）
+- 非公開：`ナレーター様向け企画説明.md` は公開しない
+- QR：`print.html?back=1&base=https://bibletechdev.github.io/bible-supple/cards/`
 
 ## 制作の流れ（1節あたり）
 1. 図版：Nano Banana（Gemini 2.5 Flash Image）で文字なし図版 → Canva で聖句を重ねる → `images/<id>.jpg`
