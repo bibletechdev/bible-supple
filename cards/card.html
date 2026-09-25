@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>みことばAR（カード追跡型）</title>
+<!--
+  カードそのものをカメラで写すと、カードの上に3Dが立ち上がるタイプ (画像トラッキング)。
+  1. カード表面の画像(PNG/JPG)を https://hiukim.github.io/mind-ar-js-doc/tools/compile で .mind に変換
+  2. targets/card.mind として保存
+  3. https でホスティング (GitHub Pages 等)。カメラ利用は https 必須
+-->
+<script src="https://cdn.jsdelivr.net/npm/aframe@1.5.0/dist/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+<style>body{margin:0}</style>
+</head>
+<body>
+<a-scene mindar-image="imageTargetSrc: targets/card.mind; autoStart: true;"
+         color-space="sRGB" renderer="colorManagement: true"
+         vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+  <a-assets>
+    <a-asset-item id="model" src="models/cross.glb"></a-asset-item>
+    <audio id="voice" src="audio/john-11-25.mp3" preload="auto"></audio>
+  </a-assets>
+
+  <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+  <!-- targetIndex 0 = .mind の1枚目の画像 -->
+  <a-entity mindar-image-target="targetIndex: 0" id="target">
+    <a-gltf-model src="#model" position="0 0 0" rotation="0 0 0" scale="1 1 1"
+                  animation="property: rotation; to: 0 360 0; loop: true; dur: 12000; easing: linear"></a-gltf-model>
+  </a-entity>
+</a-scene>
+<script>
+  // カードを認識したら朗読を再生、外れたら停止
+  const target = document.querySelector('#target');
+  const voice  = document.querySelector('#voice');
+  target.addEventListener('targetFound', () => voice.play().catch(()=>{}));
+  target.addEventListener('targetLost',  () => voice.pause());
+</script>
+</body>
+</html>

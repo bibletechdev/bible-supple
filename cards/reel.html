@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080">
+<title>みことばカード リール</title>
+<!--
+  SNS（Instagram リール / TikTok / YouTube ショート）用の縦長動画 1080×1920 の1コマを描くページ。
+  ・reel.html?v=moses        … ブラウザで開くと約8秒の動きをくり返す（画面録画にも使える）
+  ・tools/make_videos.py     … このページを1コマずつ撮影して mp4 にする（window.seek(t) を使う）
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=M+PLUS+Rounded+1c:wght@500;700;800;900&family=Shippori+Mincho:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="cards.css">
+<style>
+  html,body{margin:0; width:1080px; height:1920px; overflow:hidden; background:#0b1022}
+  body{position:relative; font-family:"M PLUS Rounded 1c",sans-serif; color:#efe7d4;
+    background:
+      radial-gradient(900px 700px at 50% 42%, color-mix(in srgb, var(--t1, #e2c275) 38%, transparent), transparent 70%),
+      radial-gradient(1200px 600px at 50% -100px, rgba(226,194,117,.25), transparent 70%),
+      radial-gradient(700px 500px at 100% 80%, rgba(90,110,220,.18), transparent 70%),
+      #0b1022}
+  .rays{position:absolute; left:50%; top:44%; width:2400px; height:2400px; margin:-1200px 0 0 -1200px; opacity:.35;
+    background:repeating-conic-gradient(from 0deg, rgba(255,240,200,.14) 0deg 4deg, transparent 4deg 12deg);
+    -webkit-mask:radial-gradient(circle, #000 0%, transparent 55%); mask:radial-gradient(circle, #000 0%, transparent 55%)}
+  .top{position:absolute; top:96px; left:0; right:0; text-align:center}
+  .top .en{font-family:Cinzel,serif; font-size:30px; letter-spacing:.5em; color:#e2c275}
+  .top .no{margin-top:14px; font-size:40px; font-weight:800; letter-spacing:.08em}
+  .top .no b{font-family:Cinzel,serif; color:#ffe7a0}
+  #stage{position:absolute; left:50%; top:250px; width:760px; margin-left:-380px}
+  .bottom{position:absolute; left:60px; right:60px; top:1440px; text-align:center}
+  .bottom h1{margin:0; font-size:88px; font-weight:900; letter-spacing:.04em; color:#fff; text-shadow:0 6px 30px rgba(0,0,0,.5)}
+  .bottom .rar{margin-top:12px; font-size:36px; font-weight:800; color:#ffe7a0; letter-spacing:.1em}
+  .bottom .rar.hr{font-family:Cinzel,serif; font-size:42px; background:linear-gradient(90deg,#ff5fae,#ffcf3a,#39e0a0,#3ab0ff,#a86bff,#ff5fae); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .bottom p{margin:22px 0 0; font-family:"Shippori Mincho",serif; font-size:40px; line-height:1.7; font-weight:700; text-wrap:balance}
+  .cta{position:absolute; left:0; right:0; bottom:120px; text-align:center; font-size:32px; color:#a39c8c; letter-spacing:.12em}
+  .cta b{color:#e2c275}
+</style>
+</head>
+<body>
+<div class="rays" id="rays"></div>
+<div class="top"><div class="en">MIKOTOBA CARD</div><div class="no" id="no"></div></div>
+<div id="stage"></div>
+<div class="bottom" id="bottom"></div>
+<div class="cta">売上の10%を教会に献金 ・ <b>#みことばカード</b></div>
+
+<script src="verses.js"></script>
+<script src="icons.js"></script>
+<script src="cards.js"></script>
+<script>
+(function () {
+  const id = new URLSearchParams(location.search).get("v") || VERSES[0].id;
+  const v = VERSES.find((x) => x.id === id) || VERSES[0];
+  const T = TYPES[v.type] || { c1: "#9fb6d8" };
+  document.body.style.setProperty("--t1", T.c1);
+  document.title = `リール ${v.name}`;
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  document.getElementById("no").innerHTML = `No.<b>${MC.pad(v.no)}</b> / ${VERSES.length}`;
+  const R = MC.RARITY[v.rarity];
+  document.getElementById("bottom").innerHTML =
+    `<h1>${esc(v.name)}</h1><div class="rar ${v.rarity === "hr" ? "hr" : ""}">${v.rarity === "hr" ? "SSSSSSSSSSSSSSS" : R.label}　${R.name}</div><p>${esc(v.desc)}</p>`;
+
+  const card = MC.render(v);
+  document.getElementById("stage").appendChild(card);
+  const stage = document.getElementById("stage"), bottom = document.getElementById("bottom"), rays = document.getElementById("rays");
+
+  const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+  const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+  const seg = (t, a, b) => clamp((t - a) / (b - a));
+  const DURATION = 8;
+
+  // t 秒の姿を描く（同じ t なら必ず同じ絵になる）
+  function seek(t) {
+    const enter = ease(seg(t, 0, 0.9));
+    const sweep = ease(seg(t, 0.9, 4.6));
+    const flip1 = ease(seg(t, 4.6, 5.5));
+    const flip2 = ease(seg(t, 6.5, 7.4));
+    let ry = -14 + 30 * sweep + 164 * flip1 + 180 * flip2;          // -14 → 16 → 180 → 360
+    if (t < 0.9) ry = -30 + 16 * enter;
+    const rx = 7 * Math.sin(sweep * Math.PI * 2) * (1 - flip1) + 3 * Math.sin(t * 2);
+    const mx = 8 + 84 * sweep, my = 25 + 50 * sweep;
+    const act = t < 0.9 ? enter : t > 7.4 ? 0.6 : 1;
+    card.style.setProperty("--rx", rx.toFixed(2) + "deg");
+    card.style.setProperty("--ry", ry.toFixed(2) + "deg");
+    card.style.setProperty("--mx", mx.toFixed(1) + "%");
+    card.style.setProperty("--my", my.toFixed(1) + "%");
+    card.style.setProperty("--act", act.toFixed(3));
+    const y = (1 - enter) * 260, sc = 0.82 + 0.18 * enter + 0.02 * Math.sin(t * 1.6);
+    stage.style.transform = `translateY(${y.toFixed(1)}px) scale(${sc.toFixed(4)})`;
+    stage.style.opacity = enter.toFixed(3);
+    const txt = ease(seg(t, 0.6, 1.4));
+    bottom.style.opacity = txt.toFixed(3);
+    bottom.style.transform = `translateY(${((1 - txt) * 40).toFixed(1)}px)`;
+    rays.style.transform = `rotate(${(t * 6).toFixed(2)}deg)`;
+  }
+
+  window.DURATION = DURATION;
+  window.seek = seek;
+  window.ready = (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => new Promise((ok) => requestAnimationFrame(() => { MC.fit(card); ok(true); })));
+
+  // 自動撮影でないときは、くり返し再生する
+  if (!navigator.webdriver) {
+    const t0 = performance.now();
+    const loop = (now) => { seek(((now - t0) / 1000) % (DURATION + 1)); requestAnimationFrame(loop); };
+    window.ready.then(() => requestAnimationFrame(loop));
+  } else {
+    seek(0);
+  }
+})();
+</script>
+</body>
+</html>

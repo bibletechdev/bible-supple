@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1022">
+<title>AIで作るクリスチャン証の漫画セミナー</title>
+<!--
+  セミナー告知画像を、みことばカードと同じ演出（傾き・ホロ・キラ・反射・裏返し）で見せる3Dポスター。
+  画像は3層に分けて奥行きを付けている（傾けると手前の層ほど大きくずれて、飛び出して見える）。
+    images/manga-seminar.webp         … 元の画像（そのまま）
+    images/manga-seminar-bg.webp      … 人物と文字を消して背景で埋めた画像（いちばん奥。ずらしても二重に見えない）
+    images/manga-seminar-person.webp  … 人物とタブレットの切り抜き（中間）
+    images/manga-seminar-title.webp   … 上下のタイトル文字の切り抜き（いちばん手前）
+  演出の本体は cards.css / cards.js（MC.live）を共用。
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Shippori+Mincho:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="cards.css">
+<style>
+  :root{ --bg:#0b1022; --ink:#efe7d4; --muted:#a39c8c; --gold:#e2c275; --line:rgba(226,194,117,.22); }
+  *{box-sizing:border-box}
+  html{background:var(--bg)}
+  body{
+    margin:0; min-height:100svh; color:var(--ink); padding:0 16px 40px; overflow-x:hidden;
+    font-family:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+    background:
+      radial-gradient(900px 600px at 50% 10%, rgba(255,190,230,.16), transparent 70%),
+      radial-gradient(700px 500px at 90% 60%, rgba(120,200,255,.14), transparent 70%),
+      radial-gradient(700px 500px at 10% 80%, rgba(255,220,120,.10), transparent 70%),
+      var(--bg);
+  }
+  main{display:flex; flex-direction:column; align-items:center; gap:18px; padding-top:max(22px, env(safe-area-inset-top))}
+  .brand{font-family:Cinzel,serif; letter-spacing:.45em; font-size:.72rem; color:var(--gold); margin:0}
+
+  /* ── ポスター本体（カードの仕組みを流用し、縦横比だけ画像に合わせる） ── */
+  .stage{width:min(88vw, calc((100svh - 170px) * 896 / 1200), 540px); position:relative}
+  .floor{position:absolute; left:8%; right:8%; bottom:-5%; height:10%; border-radius:50%;
+    background:radial-gradient(closest-side, rgba(0,0,0,.55), transparent); filter:blur(10px); z-index:-1;
+    transform:translateX(calc(sin(var(--ry, 0deg)) * -40px))}
+  .poster{ aspect-ratio:896/1200; perspective:1100px; --depth:1; --persp:1100; }
+  .poster .mc-front{ padding:0; }
+  .poster .mc-face{ border-radius:3.4cqw; }
+  .poster .mc-front > .mc-holo{ --holo:.55; -webkit-mask:none; mask:none; mix-blend-mode:soft-light; filter:saturate(1.1); }
+  .poster{ --idle-holo:.15; }
+  .poster .mc-sparkle{ opacity:calc(.2 + var(--act) * .8); }
+  .p-art{ position:absolute; inset:2.4cqw; border-radius:2.2cqw; overflow:hidden; box-shadow:inset 0 0 0 .3cqw rgba(255,255,255,.7); }
+  .p-art img, .p-layer img{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+
+  /* 手前に浮かせる層：奥行き(z)だけ前に出し、遠近で大きく見える分を縮めて、静止時は元の絵とぴったり重ねる */
+  .p-layer{
+    position:absolute; inset:2.4cqw; pointer-events:none;
+    backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    transform:translateZ(calc(var(--z) * var(--depth) * 1px)) scale(calc((var(--persp) - var(--z) * var(--depth)) / var(--persp)));
+    filter:drop-shadow(calc(sin(var(--ry, 0deg)) * var(--depth) * -26px) calc(sin(var(--rx, 0deg)) * var(--depth) * 26px + 8px) 10px rgba(40,20,60,.35));
+    transition:transform .5s cubic-bezier(.2,.8,.2,1);
+  }
+  .p-person{ --z:32; }
+  .p-title{ --z:60; }
+  /* タイトル文字の上だけを走る虹色の光 */
+  .p-title .sheen{
+    position:absolute; inset:0; mix-blend-mode:overlay; opacity:calc(.35 + var(--act) * .65);
+    -webkit-mask:url(images/manga-seminar-title.webp) center/100% 100% no-repeat; mask:url(images/manga-seminar-title.webp) center/100% 100% no-repeat;
+    background:
+      linear-gradient(115deg, transparent 20%, rgba(255,255,255,.95) 32%, transparent 44%),
+      repeating-linear-gradient(115deg, #ff8fc8 0%, #ffe38a 6%, #8fffc4 12%, #8fd8ff 18%, #c9a0ff 24%, #ff8fc8 30%);
+    background-size:260% 260%, 300% 300%;
+    background-position:var(--mx) var(--my), calc(100% - var(--mx)) var(--my);
+  }
+  /* いちばん手前で舞う光・十字架・鳩 */
+  .p-float{ position:absolute; inset:0; pointer-events:none; transform-style:preserve-3d; }
+  .p-float i{
+    position:absolute; display:block; color:#fff; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    transform:translate3d(-50%,-50%,calc(var(--z) * var(--depth) * 1px));
+    filter:drop-shadow(0 0 6px rgba(255,255,255,.9)) drop-shadow(0 0 14px var(--glow, rgba(255,200,240,.8)));
+  }
+  .p-float i b{ display:block; animation:bob var(--dur, 5s) ease-in-out infinite; animation-delay:var(--delay, 0s); }
+  .p-float svg{ width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+  .p-float .spark{ width:100%; height:100%; background:radial-gradient(circle, #fff 0 14%, rgba(255,255,255,.7) 24%, transparent 60%);
+    clip-path:polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); }
+  @keyframes bob{ 0%,100%{ transform:translateY(0) rotate(0) scale(1); opacity:.9 } 50%{ transform:translateY(-10px) rotate(8deg) scale(1.15); opacity:1 } }
+
+  /* 裏面 */
+  .poster .mc-back{ padding:10cqw 9cqw; gap:3.4cqw; }
+  .poster .mc-back .en{ font-family:Cinzel,serif; font-size:3cqw; letter-spacing:.45em; color:#e7c877; }
+  .poster .mc-back h4{ font-size:7.4cqw; line-height:1.45; letter-spacing:.08em; }
+  .poster .mc-back .lead{ margin:0; font-size:4.4cqw; line-height:2; color:#f6ecd2; }
+  .poster .mc-back .tags{ display:flex; flex-wrap:wrap; justify-content:center; gap:2cqw; }
+  .poster .mc-back .tags span{ padding:1.2cqw 3cqw; border:.3cqw solid rgba(231,200,119,.55); border-radius:99cqw; font-size:3.3cqw; color:#f7e3a8; }
+
+  /* 操作 */
+  .bar{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center}
+  .btn{display:inline-flex; align-items:center; gap:8px; padding:11px 18px; border-radius:99px; border:1px solid var(--line); background:rgba(255,255,255,.06); color:var(--ink); font:inherit; font-size:.86rem; letter-spacing:.08em; cursor:pointer}
+  .btn.primary{background:linear-gradient(180deg,#f0d58c,#b48a3c); color:#231a06; border:0; font-weight:700}
+  .depth{display:inline-flex; align-items:center; gap:10px; font-size:.8rem; color:var(--muted); letter-spacing:.08em}
+  .depth input{accent-color:var(--gold); width:120px}
+  .hint{margin:0; font-size:.76rem; color:var(--muted); letter-spacing:.1em; text-align:center}
+  @media (prefers-reduced-motion: reduce){ .p-float i b{ animation:none } }
+</style>
+</head>
+<body>
+<main>
+  <p class="brand">MIKOTOBA CARD ・ SEMINAR</p>
+
+  <div class="stage">
+    <div class="mc is-full poster" id="poster" data-rarity="s2" style="--c1:#d86aa8; --c2:#9fd8ff"
+         role="img" aria-label="絵心ゼロでも大丈夫　AIで作る　クリスチャン証の漫画セミナー">
+      <div class="mc-rot">
+        <div class="mc-face mc-front">
+          <div class="p-art"><img src="images/manga-seminar-bg.webp" alt="" decoding="async"></div>
+          <div class="mc-fx mc-holo"></div>
+          <div class="mc-fx mc-sparkle"></div>
+          <div class="mc-fx mc-glare"></div>
+        </div>
+        <div class="p-layer p-person"><img src="images/manga-seminar-person.webp" alt="" decoding="async"></div>
+        <div class="p-layer p-title"><img src="images/manga-seminar-title.webp" alt="" decoding="async"><div class="sheen"></div></div>
+        <div class="p-float" id="float"></div>
+        <div class="mc-face mc-back">
+          <div class="mc-emblem" id="emblem"></div>
+          <span class="en">MANGA SEMINAR</span>
+          <h4>AIで作る<br>クリスチャン証の<br>漫画セミナー</h4>
+          <p class="lead">絵心ゼロでも大丈夫。<br>あなたの証を、AIと一緒に<br>一冊の漫画にしませんか。</p>
+          <div class="tags"><span>初心者歓迎</span><span>AI作画</span><span>証の漫画</span></div>
+          <span class="mc-brand">MIKOTOBA CARD</span>
+        </div>
+      </div>
+    </div>
+    <div class="floor" id="floor"></div>
+  </div>
+
+  <p class="hint">ドラッグ・スマホを傾けると立体に ・ タップで裏返す</p>
+  <div class="bar">
+    <button class="btn primary" id="flip">↻ 裏返す</button>
+    <button class="btn" id="gyro" hidden>📱 傾きで動かす</button>
+    <label class="depth">奥行き <input type="range" id="depth" min="0" max="2" step="0.1" value="1"></label>
+  </div>
+</main>
+
+<script src="icons.js"></script>
+<script src="cards.js"></script>
+<script>
+(function () {
+  const poster = document.getElementById("poster");
+
+  // 裏面のエンブレムは、みことばカードの裏と同じものを使う
+  document.getElementById("emblem").innerHTML =
+    '<svg viewBox="-4 -4 108 108" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round">' +
+    '<circle cx="50" cy="50" r="44" stroke-width="1.5"/><circle cx="50" cy="50" r="38" stroke-width=".8" stroke-dasharray="1 3"/>' +
+    '<path d="M50 18v64M34 38h32" stroke-width="5"/></g></svg>';
+
+  // 手前で舞う飾り：位置(%)・大きさ(cqw)・奥行き(px)・種類
+  const svg = (name) => `<svg viewBox="0 0 24 24">${ICONS[name] || ""}</svg>`;
+  const items = [
+    [6, 30, 5, 140, "spark"], [93, 24, 4, 120, "spark"], [12, 62, 3.5, 160, "spark"], [90, 58, 5, 150, "spark"],
+    [50, 4, 3, 110, "spark"], [28, 50, 2.6, 180, "spark"], [74, 48, 3, 170, "spark"], [95, 88, 3.4, 130, "spark"],
+    [4, 86, 4, 150, "x-cross"], [96, 42, 4.4, 130, "x-cross"], [8, 46, 5, 120, "bird"], [92, 72, 6, 150, "bird"],
+    [70, 30, 3.6, 190, "bird"], [30, 95, 3, 140, "spark"],
+  ];
+  document.getElementById("float").innerHTML = items.map(([x, y, s, z, kind], i) => {
+    const glow = ["rgba(255,170,220,.9)", "rgba(140,220,255,.9)", "rgba(255,230,140,.9)"][i % 3];
+    const inner = kind === "spark" ? '<div class="spark"></div>' : svg(kind);
+    return `<i style="left:${x}%;top:${y}%;width:${s}cqw;height:${s}cqw;--z:${z};--glow:${glow}"><b style="--dur:${4 + (i % 4)}s;--delay:${(i * 0.37).toFixed(2)}s;width:100%;height:100%">${inner}</b></i>`;
+  }).join("");
+
+  // 傾き・光・裏返し（カードと同じエンジン）
+  const ctl = MC.live(poster, { drag: true, tapFlip: true, gyro: true, idle: true });
+  document.getElementById("flip").onclick = () => ctl.flip();
+
+  // 影を傾きに合わせて動かす（--ry をステージにも渡す）
+  const floor = document.getElementById("floor");
+  new MutationObserver(() => floor.style.setProperty("--ry", poster.style.getPropertyValue("--ry"))).observe(poster, { attributes: true, attributeFilter: ["style"] });
+
+  // 奥行きの強さ
+  document.getElementById("depth").addEventListener("input", (e) => poster.style.setProperty("--depth", e.target.value));
+
+  // iPhone は傾きセンサーの許可ボタンを出す
+  const D = window.DeviceOrientationEvent;
+  if (D && typeof D.requestPermission === "function" && matchMedia("(pointer: coarse)").matches) {
+    const b = document.getElementById("gyro"); b.hidden = false;
+    b.onclick = async () => { if (await MC.askGyro()) b.hidden = true; };
+  } else {
+    poster.addEventListener("pointerdown", () => MC.askGyro(), { once: true });
+  }
+})();
+</script>
+</body>
+</html>

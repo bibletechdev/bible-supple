@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1022">
+<title>みことばカード</title>
+<!--
+  QRコードの遷移先ページ。
+  ・パラメータなし     … 全100枚のコレクション（タップで拡大・裏返し）
+  ・?v=john-11-25      … その1枚のページ（カード＋朗読＋黙想）。QRはこちらを指す
+  カードの見た目は cards.css / cards.js、データは verses.js（tools/build_cards.py で生成）。
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=M+PLUS+Rounded+1c:wght@500;700;800;900&family=Shippori+Mincho:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="cards.css">
+<style>
+  :root{
+    --bg:#0b1022; --bg2:#141b38; --ink:#efe7d4; --muted:#a39c8c; --gold:#e2c275; --gold2:#b48a3c; --line:rgba(226,194,117,.22);
+  }
+  *{box-sizing:border-box}
+  html{background:var(--bg)}
+  body{
+    margin:0; min-height:100vh; color:var(--ink); padding:0 16px 64px;
+    font-family:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+    background:
+      radial-gradient(1200px 600px at 50% -200px, rgba(226,194,117,.18), transparent 70%),
+      radial-gradient(800px 500px at 100% 30%, rgba(90,110,220,.14), transparent 70%),
+      radial-gradient(800px 500px at 0% 70%, rgba(180,80,140,.10), transparent 70%),
+      var(--bg);
+  }
+  main{max-width:1180px; margin:0 auto}
+  a{color:var(--gold)}
+  button{font-family:inherit}
+
+  /* ヘッダー */
+  .hero{text-align:center; padding:44px 0 20px}
+  .hero .en{font-family:Cinzel,serif; letter-spacing:.5em; font-size:.78rem; color:var(--gold); margin:0}
+  .hero h1{margin:10px 0 6px; font-size:clamp(1.7rem,5vw,2.5rem); font-weight:800; letter-spacing:.18em;
+    background:linear-gradient(180deg,#fff6d6,#e2c275 60%,#b48a3c); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .hero p{margin:0; color:var(--muted); font-size:.9rem; letter-spacing:.08em}
+  .hero .count{display:inline-flex; gap:14px; margin-top:16px; padding:8px 18px; border:1px solid var(--line); border-radius:99px; font-size:.8rem; color:var(--ink); background:rgba(255,255,255,.03)}
+  .hero .count b{color:var(--gold); font-family:Cinzel,serif}
+
+  /* 絞り込み */
+  .filters{display:flex; flex-direction:column; gap:10px; margin:18px 0 26px}
+  .chips{display:flex; gap:8px; overflow-x:auto; padding:2px 2px 6px; scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none; display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:99px; border:1px solid var(--line);
+    background:rgba(255,255,255,.04); color:var(--ink); font-size:.82rem; cursor:pointer; letter-spacing:.06em; transition:background .2s,border-color .2s}
+  .chip i{width:9px; height:9px; border-radius:50%; background:var(--c,#e2c275); box-shadow:0 0 8px var(--c,#e2c275)}
+  .chip small{color:var(--muted); font-size:.72rem}
+  .chip[aria-pressed="true"]{background:linear-gradient(180deg,rgba(226,194,117,.28),rgba(226,194,117,.12)); border-color:var(--gold)}
+
+  /* 一覧 */
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:22px 16px}
+  @media (min-width:700px){ .grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:30px 22px} }
+  .slot{position:relative; cursor:pointer; border:0; padding:0; background:none; text-align:left; transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+  .slot:hover{transform:translateY(-6px) scale(1.03); z-index:2}
+  .slot:focus-visible{outline:2px solid var(--gold); outline-offset:6px; border-radius:12px}
+  .slot.is-hidden{display:none}
+  .slot.is-open{visibility:hidden}
+  .empty{text-align:center; color:var(--muted); padding:40px 0}
+  .legend{display:flex; flex-wrap:wrap; justify-content:center; gap:6px 16px; margin:34px 0 0; color:var(--muted); font-size:.74rem}
+  footer.site{margin-top:48px; text-align:center; font-size:.76rem; color:var(--muted); line-height:2}
+
+  /* 拡大表示 */
+  .modal{position:fixed; inset:0; z-index:50; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:16px}
+  .modal[hidden]{display:none}
+  .modal .veil{position:absolute; inset:0; background:radial-gradient(circle at 50% 40%, rgba(20,27,56,.82), rgba(5,8,18,.95)); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); opacity:0; transition:opacity .35s}
+  .modal.is-in .veil{opacity:1}
+  .stage{position:relative; width:min(84vw, calc((100svh - 190px) * 100 / 148), 430px); transform-origin:0 0; will-change:transform}
+  .stage.is-anim{transition:transform .55s cubic-bezier(.18,.9,.22,1)}
+  .modal .bar{position:relative; display:flex; gap:10px; flex-wrap:wrap; justify-content:center; opacity:0; transform:translateY(10px); transition:opacity .35s .15s, transform .35s .15s}
+  .modal.is-in .bar{opacity:1; transform:none}
+  .btn{display:inline-flex; align-items:center; gap:8px; padding:11px 18px; border-radius:99px; border:1px solid var(--line); background:rgba(255,255,255,.06); color:var(--ink); font-size:.86rem; letter-spacing:.08em; cursor:pointer; text-decoration:none}
+  .btn.primary{background:linear-gradient(180deg,#f0d58c,#b48a3c); color:#231a06; border:0; font-weight:700; box-shadow:0 6px 20px rgba(180,138,60,.35)}
+  .btn:disabled{opacity:.45; cursor:default}
+  .nav{position:absolute; top:50%; transform:translateY(-50%); z-index:2; width:44px; height:44px; border-radius:50%; border:1px solid var(--line); background:rgba(11,16,34,.6); color:var(--ink); font-size:1.2rem; cursor:pointer}
+  .nav.prev{left:max(8px, calc(50% - 300px))} .nav.next{right:max(8px, calc(50% - 300px))}
+  .close{position:absolute; top:max(14px, env(safe-area-inset-top)); right:16px; z-index:2; width:42px; height:42px; border-radius:50%; border:1px solid var(--line); background:rgba(11,16,34,.6); color:var(--ink); font-size:1.3rem; cursor:pointer}
+  .hint{position:relative; margin:0; font-size:.74rem; color:var(--muted); letter-spacing:.1em; opacity:0; transition:opacity .4s .3s}
+  .modal.is-in .hint{opacity:1}
+  @media (max-width:640px){ .nav{display:none} }
+
+  /* 1枚のページ */
+  .single{max-width:460px; margin:0 auto; padding-top:26px}
+  .single .top{display:flex; justify-content:space-between; align-items:center; font-size:.8rem; margin-bottom:18px}
+  .single .top a{text-decoration:none; letter-spacing:.08em}
+  .single .brand{font-family:Cinzel,serif; letter-spacing:.4em; color:var(--gold); font-size:.72rem}
+  .single .cardwrap{width:min(100%, calc((100svh - 150px) * 100 / 148)); margin:0 auto}
+  .single .hint{opacity:1; text-align:center; margin-top:14px}
+  .play{display:flex; align-items:center; justify-content:center; gap:12px; width:100%; margin:24px 0 8px; padding:16px 22px; border:0; border-radius:999px;
+    background:linear-gradient(180deg,#f0d58c,#b48a3c); color:#231a06; font-size:1.02rem; font-weight:700; letter-spacing:.12em; cursor:pointer; box-shadow:0 8px 24px rgba(180,138,60,.35)}
+  .play:disabled{background:rgba(255,255,255,.08); color:var(--muted); box-shadow:none; cursor:default}
+  .progress{height:3px; background:rgba(255,255,255,.1); border-radius:2px; overflow:hidden; margin:0 10px}
+  .progress i{display:block; height:100%; width:0; background:var(--gold); transition:width .25s linear}
+  .med{margin-top:26px; padding:20px 22px; border:1px solid var(--line); border-radius:16px; background:rgba(255,255,255,.03)}
+  .med h2{margin:0 0 10px; font-size:.86rem; letter-spacing:.3em; color:var(--gold); text-align:center; font-weight:700}
+  .med p{margin:0; line-height:2.05; font-size:.95rem}
+  .med p.ref{margin-top:8px; text-align:right; font-size:.8rem; color:var(--muted)}
+  .one{text-align:center; margin:22px 0 0; line-height:1.9; color:var(--ink)}
+  .ar-link{display:block; text-align:center; margin-top:22px; font-size:.86rem}
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<div class="modal" id="modal" hidden aria-modal="true" role="dialog" aria-label="カードの拡大表示">
+  <div class="veil" data-close></div>
+  <button class="close" data-close aria-label="閉じる">×</button>
+  <button class="nav prev" id="prev" aria-label="前のカード">‹</button>
+  <button class="nav next" id="next" aria-label="次のカード">›</button>
+  <div class="stage" id="stage"></div>
+  <p class="hint">タップで裏返す ・ ドラッグや傾きで光ります</p>
+  <div class="bar">
+    <button class="btn" id="flip">↻ 裏返す</button>
+    <button class="btn primary" id="listen">▶ 朗読を聞く</button>
+  </div>
+  <audio id="modalAudio" preload="none"></audio>
+</div>
+
+<script src="verses.js"></script>
+<script src="icons.js"></script>
+<script src="cards.js"></script>
+<script>
+(function () {
+  const app = document.getElementById("app");
+  const id = new URLSearchParams(location.search).get("v");
+  const v = VERSES.find((x) => x.id === id);
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const refit = (root) => requestAnimationFrame(() => root.querySelectorAll(".mc").forEach(MC.fit));
+  const whenFonts = (fn) => (document.fonts && document.fonts.ready ? document.fonts.ready.then(fn) : fn());
+
+  v ? single(v) : collection();
+
+  // ───────── 1枚のページ（QRの遷移先） ─────────
+  function single(v) {
+    document.title = `${v.title} ─ みことばカード`;
+    const i = VERSES.indexOf(v);
+    app.innerHTML = `
+      <div class="single">
+        <div class="top"><a href="./">‹ 全${VERSES.length}枚を見る</a><span class="brand">MIKOTOBA CARD</span></div>
+        <div class="cardwrap" id="cardwrap"></div>
+        <p class="hint">カードをタップで裏返す ・ スマホを傾けると光ります</p>
+        <p class="one">${esc(v.one)}</p>
+        <button class="play" id="play" ${v.audio ? "" : "disabled"}><span class="ico">▶</span><span id="label">${v.audio ? "みことばを聞く" : "朗読は準備中です"}</span></button>
+        <div class="progress"><i id="bar"></i></div>
+        ${v.audio ? `<audio id="voice" preload="metadata" src="${esc(v.audio)}"></audio>` : ""}
+        <section class="med"><h2>み こ と ば</h2><p>${esc(v.text.replace(/ +/g, ""))}</p><p class="ref">${esc(v.ref)}（口語訳）</p></section>
+        ${v.meditation ? `<section class="med"><h2>黙 想</h2><p>${esc(v.meditation)}</p></section>` : ""}
+        ${v.ar ? `<a class="ar-link" href="ar.html?v=${v.id}">✦ 限定版：3Dで目の前に置いて見る（AR）</a>` : ""}
+        <footer class="site">このカードは、売上の10%を教会に献金しています。<br>聖書本文：口語訳</footer>
+      </div>`;
+    const card = MC.render(v);
+    document.getElementById("cardwrap").appendChild(card);
+    const ctl = MC.live(card, { drag: true, tapFlip: true, gyro: true, idle: true });
+    card.addEventListener("pointerdown", () => MC.askGyro(), { once: true });
+    refit(app); whenFonts(() => refit(app));
+
+    if (v.audio) {
+      const audio = document.getElementById("voice"), btn = document.getElementById("play"), label = document.getElementById("label"),
+            bar = document.getElementById("bar"), ico = btn.querySelector(".ico");
+      audio.addEventListener("timeupdate", () => { if (audio.duration) bar.style.width = (audio.currentTime / audio.duration) * 100 + "%"; });
+      audio.addEventListener("ended", () => { ico.textContent = "▶"; label.textContent = "もう一度聞く"; bar.style.width = "0"; });
+      audio.addEventListener("error", () => { btn.disabled = true; label.textContent = "朗読は準備中です"; });
+      btn.addEventListener("click", () => {
+        if (audio.paused) { audio.play(); ico.textContent = "❚❚"; label.textContent = "再生中"; }
+        else { audio.pause(); ico.textContent = "▶"; label.textContent = "つづきを聞く"; }
+      });
+    }
+  }
+
+  // ───────── コレクション（全100枚） ─────────
+  function collection() {
+    document.title = `みことばカード ─ 全${VERSES.length}枚`;
+    const count = (k, val) => VERSES.filter((x) => x[k] === val).length;
+    const rarOrder = ["d1", "d2", "d3", "d4", "s1", "s2", "cr", "hr"];
+    const rarLabel = (r) => (r === "hr" ? "ハイパー" : MC.RARITY[r].label);
+    const groups = [["", "すべて", VERSES.length, "#e2c275"], ["person", "人物", VERSES.filter((x) => x.kind === "person").length, "#f3c64a"], ["item", "アイテム", VERSES.filter((x) => x.kind === "item").length, "#9fb6d8"],
+      ...Object.entries(TYPES).filter(([k]) => k !== "C").map(([k, t]) => [k, t.name, count("type", k), t.c1])];
+    const matchGroup = (x, g) => !g || (g === "person" ? x.kind === "person" : g === "item" ? x.kind === "item" : x.type === g);
+    app.innerHTML = `
+      <header class="hero">
+        <p class="en">MIKOTOBA CARD</p>
+        <h1>みことばカード</h1>
+        <p>聖書の人物とアイテムが、みことばと一緒にカードになりました。</p>
+        <div class="count"><span>全 <b>${VERSES.length}</b> 枚</span><span>人物 ${groups[1][2]} ・ アイテム ${groups[2][2]}</span><span>イエス・キリストは <b>SSSSSSSSSSSSSSS</b></span></div>
+      </header>
+      <div class="filters">
+        <div class="chips" id="seriesChips" role="group" aria-label="種類とタイプで絞り込み">
+          ${groups.map(([k, n, c, col], i) => `<button class="chip" aria-pressed="${i === 0}" data-series="${k}" style="--c:${col}">${i ? "<i></i>" : ""}${esc(n)} <small>${c}</small></button>`).join("")}
+        </div>
+        <div class="chips" id="rarityChips" role="group" aria-label="レアリティで絞り込み">
+          <button class="chip" aria-pressed="true" data-rarity="">全レアリティ</button>
+          ${rarOrder.map((r) => `<button class="chip" aria-pressed="false" data-rarity="${r}">${rarLabel(r)} <small>${count("rarity", r)}</small></button>`).join("")}
+        </div>
+      </div>
+      <div class="grid" id="grid"></div>
+      <p class="empty" id="empty" hidden>該当するカードがありません</p>
+      <div class="legend">${rarOrder.map((r) => `<span>${r === "hr" ? "SSSSSSSSSSSSSSS" : MC.RARITY[r].label} ${MC.RARITY[r].name}</span>`).join("")}</div>
+      <footer class="site">売上の10%を教会に献金しています。<br>聖書本文：口語訳（新約1954年・旧約1955年）</footer>`;
+
+    const grid = document.getElementById("grid");
+    const slots = VERSES.map((x, i) => {
+      const b = document.createElement("button");
+      b.className = "slot";
+      b.dataset.i = i;
+      b.setAttribute("aria-label", `No.${MC.pad(x.no)} ${x.name}（${MC.RARITY[x.rarity].name}）`);
+      const card = MC.render(x);
+      b.appendChild(card);
+      MC.live(card, { hover: true });
+      b.addEventListener("click", () => openModal(i));
+      grid.appendChild(b);
+      return b;
+    });
+    refit(grid); whenFonts(() => refit(grid));
+
+    // 絞り込み
+    const state = { series: "", rarity: "" };
+    const applyFilter = () => {
+      let n = 0;
+      slots.forEach((b, i) => {
+        const x = VERSES[i], show = matchGroup(x, state.series) && (!state.rarity || x.rarity === state.rarity);
+        b.classList.toggle("is-hidden", !show); n += show;
+      });
+      document.getElementById("empty").hidden = n > 0;
+    };
+    const bindChips = (box, key) => box.addEventListener("click", (e) => {
+      const c = e.target.closest(".chip"); if (!c) return;
+      box.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === c));
+      state[key] = c.dataset[key]; applyFilter();
+    });
+    bindChips(document.getElementById("seriesChips"), "series");
+    bindChips(document.getElementById("rarityChips"), "rarity");
+
+    // 拡大表示
+    const modal = document.getElementById("modal"), stage = document.getElementById("stage"),
+          audio = document.getElementById("modalAudio"), listenBtn = document.getElementById("listen");
+    let cur = -1, ctl = null, from = null;
+    const visible = () => slots.filter((b) => !b.classList.contains("is-hidden")).map((b) => +b.dataset.i);
+
+    function mount(i) {
+      if (ctl) ctl.destroy();
+      audio.pause();
+      stage.innerHTML = "";
+      const x = VERSES[i];
+      const card = MC.render(x);
+      stage.appendChild(card);
+      ctl = MC.live(card, { drag: true, tapFlip: true, gyro: true, idle: true });
+      requestAnimationFrame(() => MC.fit(card));
+      listenBtn.disabled = !x.audio;
+      listenBtn.textContent = x.audio ? "▶ 朗読を聞く" : "朗読は準備中";
+      if (x.audio) audio.src = x.audio;
+      document.getElementById("flip").onclick = () => ctl.flip();
+      cur = i;
+    }
+
+    function openModal(i) {
+      mount(i);
+      modal.hidden = false;
+      document.body.style.overflow = "hidden";
+      from = slots[i];
+      from.classList.add("is-open");
+      // 一覧のカードの位置から拡大して飛び出す
+      const a = from.getBoundingClientRect(), b = stage.getBoundingClientRect();
+      stage.classList.remove("is-anim");
+      stage.style.transform = `translate(${a.left - b.left}px, ${a.top - b.top}px) scale(${a.width / b.width})`;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        stage.classList.add("is-anim");
+        stage.style.transform = "none";
+        modal.classList.add("is-in");
+      }));
+      MC.askGyro();
+    }
+    function closeModal() {
+      audio.pause();
+      const a = from.getBoundingClientRect(), b = stage.getBoundingClientRect();
+      if (ctl && ctl.flipped) ctl.setFlipped(false);
+      stage.style.transform = `translate(${a.left - b.left}px, ${a.top - b.top}px) scale(${a.width / b.width})`;
+      modal.classList.remove("is-in");
+      setTimeout(() => {
+        modal.hidden = true; stage.classList.remove("is-anim"); stage.style.transform = "";
+        from.classList.remove("is-open"); document.body.style.overflow = "";
+        if (ctl) { ctl.destroy(); ctl = null; } stage.innerHTML = "";
+      }, 520);
+    }
+    function go(d) {
+      const list = visible(), k = list.indexOf(cur);
+      const n = list[(k + d + list.length) % list.length];
+      from.classList.remove("is-open"); from = slots[n]; from.classList.add("is-open");
+      mount(n);
+    }
+    modal.addEventListener("click", (e) => { if (e.target.closest("[data-close]")) closeModal(); });
+    document.getElementById("prev").onclick = () => go(-1);
+    document.getElementById("next").onclick = () => go(1);
+    listenBtn.onclick = () => { if (audio.paused) { audio.play(); listenBtn.textContent = "❚❚ 一時停止"; } else { audio.pause(); listenBtn.textContent = "▶ 朗読を聞く"; } };
+    audio.addEventListener("ended", () => (listenBtn.textContent = "▶ もう一度聞く"));
+    document.addEventListener("keydown", (e) => {
+      if (modal.hidden) return;
+      if (e.key === "Escape") closeModal();
+      if (e.key === "ArrowLeft") go(-1);
+      if (e.key === "ArrowRight") go(1);
+      if (e.key === " " || e.key === "Enter") { e.preventDefault(); ctl && ctl.flip(); }
+    });
+    // スワイプで前後のカードへ（カードの外側で）
+    let sx = null;
+    modal.addEventListener("touchstart", (e) => { if (!e.target.closest(".mc")) sx = e.touches[0].clientX; }, { passive: true });
+    modal.addEventListener("touchend", (e) => { if (sx != null) { const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 60) go(dx < 0 ? 1 : -1); sx = null; } });
+  }
+})();
+</script>
+</body>
+</html>
